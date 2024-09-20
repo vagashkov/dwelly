@@ -48,7 +48,7 @@ THIRD_PARTY_APPS = [
 ]
 
 PROJECT_APPS = [
-
+    "accounts.apps.AccountsConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
@@ -92,7 +92,8 @@ DATABASES = {
     }
 }
 
-# Password validation
+# Authentication parameters
+AUTH_USER_MODEL = "accounts.Account"
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa: E501
