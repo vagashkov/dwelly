@@ -7,7 +7,7 @@ from django.db.models import (
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-from lib.models import BaseModel
+from core.models import BaseModel
 
 from .managers import AccountManager
 

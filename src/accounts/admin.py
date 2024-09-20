@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
+from .forms import Signup
 from .models import Account
 
 
@@ -11,6 +12,8 @@ class AccountsAdmin(UserAdmin):
 
     model = Account
 
+    add_form = Signup
+
     # Fields displayed in users list
     list_display = [
         Account.Field.email,
@@ -19,6 +22,19 @@ class AccountsAdmin(UserAdmin):
 
     ordering = (
         Account.Field.email,
+    )
+
+    add_fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    Account.Field.email,
+                    "{}1".format(Account.Field.password),
+                    "{}2".format(Account.Field.password),
+                ),
+                }
+        ),
     )
 
     # Fields displayed on user page
