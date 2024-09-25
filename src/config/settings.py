@@ -44,6 +44,7 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    # allauth lib support
     "allauth",
     "allauth.account",
 ]
@@ -98,9 +99,12 @@ DATABASES = {
 # Authentication parameters
 AUTH_USER_MODEL = "accounts.Account"
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
 LOGIN_REDIRECT_URL = "home"
 AUTH_PASSWORD_VALIDATORS = [
     {
