@@ -47,6 +47,9 @@ THIRD_PARTY_APPS = [
     # allauth lib support
     "allauth",
     "allauth.account",
+    # UI styling libs
+    "crispy_forms",
+    "crispy_bootstrap5",
 ]
 
 PROJECT_APPS = [
@@ -132,6 +135,10 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
+
+# UI styling related settings
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
