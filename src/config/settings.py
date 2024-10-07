@@ -50,6 +50,9 @@ THIRD_PARTY_APPS = [
     # UI styling libs
     "crispy_forms",
     "crispy_bootstrap5",
+    # DRF support
+    "rest_framework",
+    "rest_framework.authtoken",
 ]
 
 PROJECT_APPS = [
@@ -98,6 +101,12 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+        ),
+    }
 
 # Authentication parameters
 AUTH_USER_MODEL = "accounts.Account"
