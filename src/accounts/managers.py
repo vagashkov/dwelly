@@ -23,7 +23,7 @@ class AccountManager(BaseUserManager):
             **extra_fields
         )
         user.set_password(password)
-        user.save()
+        user.save(using=self._db)
 
         return user
 

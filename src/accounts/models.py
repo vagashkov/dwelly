@@ -78,3 +78,7 @@ class Account(AbstractBaseUser, PermissionsMixin, BaseModel):
     date_joined = DateTimeField(
         default=timezone.now
     )
+
+    def __str__(self):
+        """ Object string representation """
+        return self.email

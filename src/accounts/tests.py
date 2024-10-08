@@ -2,9 +2,10 @@ from django.test import TestCase
 from django.urls import reverse
 
 from .models import Account
+from tests.data import good_account
 
-email = "newuser@email.com"
-password = "S0meStr0ngPaSSw0rd"
+email = good_account.get(Account.Field.email)
+password = good_account.get(Account.Field.password)
 
 
 class SignUpPage(TestCase):
