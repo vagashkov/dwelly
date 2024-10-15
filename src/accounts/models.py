@@ -44,15 +44,16 @@ class Account(AbstractBaseUser, PermissionsMixin, BaseModel):
         verbose_name = _("Account")
         verbose_name_plural = _("Accounts")
 
-    objects = AccountManager()
+    objects: AccountManager = AccountManager()
 
     # users are identified by email
-    USERNAME_FIELD = Field.email
+    EMAIL_FIELD: str = Field.email
+    USERNAME_FIELD: str = Field.email
     # and it is the only (except password) field
     # needed to create an account
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS: list = []
 
-    email = EmailField(
+    email: EmailField = EmailField(
         null=False,
         blank=False,
         unique=True,
@@ -60,25 +61,25 @@ class Account(AbstractBaseUser, PermissionsMixin, BaseModel):
         verbose_name=_("Email")
     )
 
-    is_active = BooleanField(
+    is_active: BaseModel = BooleanField(
         default=True,
         verbose_name=_("Is active")
     )
 
-    is_staff = BooleanField(
+    is_staff: BooleanField = BooleanField(
         default=False,
         verbose_name=_("Is staff")
     )
 
-    is_superuser = BooleanField(
+    is_superuser: BooleanField = BooleanField(
         default=False,
         verbose_name=_("Is superuser")
     )
 
-    date_joined = DateTimeField(
+    date_joined: DateTimeField = DateTimeField(
         default=timezone.now
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         """ Object string representation """
-        return self.email
+        return "{}".format(self.email)
