@@ -6,6 +6,7 @@ from rest_framework.serializers import (
 )
 
 from ...constants import (
+    ERROR_MSG_DUPLICATE_MAIL,
     ERROR_MSG_DIFFERENT_PASSWORDS,
     ERROR_ALLAUTH_NOT_INSTALLED
 )
@@ -41,6 +42,17 @@ class PostSerializer(Serializer):
         write_only=True
     )
 
+    def validate_email(self, email):
+        try:
+            Account.objects.get(
+                email=email
+            )
+            raise ValidationError(
+                ERROR_MSG_DUPLICATE_MAIL
+            )
+        except Account.DoesNotExist:
+            return email
+
     def validate(self, data):
         if data.get(
             "{}1".format(Account.Field.password)
@@ -73,35 +85,38 @@ class PostSerializer(Serializer):
         # Getting designated (almost always default) adapter
         adapter = get_adapter()
 
-        # Create new CustomUser object
-        user = adapter.new_user(request)
+        # Create new Account object
+        account = adapter.new_user(request)
 
         # Prepare cleaned data
         self.cleaned_data = self.get_cleaned_data()
 
         # Update user base fields
-        user = adapter.save_user(request, user, self, commit=False)
+        account = adapter.save_user(
+            request,
+            account,
+            self,
+            commit=False
+        )
 
-        # Set user password
-        if "{}1".format(Account.Field.password) in self.cleaned_data:
+        # Set account password
+        if "password1" in self.cleaned_data:
             try:
                 adapter.clean_password(
                     self.cleaned_data.get(
-                        "{}1".format(
-                            Account.Field.password
-                        )
+                        "password1"
                     ),
-                    user=user
+                    user=account
                     )
             except DjangoValidationError as exc:
                 raise ValidationError(
                     detail=as_serializer_error(exc)
                     )
-        # And finally save new user to database
-        user.save()
+        # And finally save new account to database
+        account.save()
 
         # Perform other post-registration routines if necessary
-        setup_user_email(request, user, [])
+        setup_user_email(request, account, [])
 
-        # Finally return fresh made user object
-        return user
+        # Finally return fresh made account object
+        return account

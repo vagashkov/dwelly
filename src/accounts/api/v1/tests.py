@@ -3,12 +3,16 @@ from django.urls import reverse
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.status import (
     HTTP_200_OK,
+    HTTP_201_CREATED,
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 from rest_framework.test import APITestCase
 
-from accounts.constants import ERROR_MSG_DIFFERENT_PASSWORDS
-from accounts.models import Account
+from ...constants import (
+    ERROR_MSG_DUPLICATE_MAIL,
+    ERROR_MSG_DIFFERENT_PASSWORDS
+)
+from ...models import Account
 from tests.data import good_account
 
 API_URL = "accounts/api/v1/{}"
@@ -97,7 +101,7 @@ class RegistrationTest(APITestCase):
             response.status_code,
             HTTP_422_UNPROCESSABLE_ENTITY
         )
-        # check if custom error has beed returned
+        # check if custom error has been returned
         self.assertIn("non_field_errors", response.data)
         error_object = ErrorDetail(
             string=ERROR_MSG_DIFFERENT_PASSWORDS,
@@ -106,6 +110,95 @@ class RegistrationTest(APITestCase):
         self.assertIn(
             error_object,
             response.data.get("non_field_errors")
+        )
+
+    def test_create_user_correct_data(self):
+        # Create user though API call
+        response = self.client.post(
+            reverse("rest_register"),
+            {
+                "email": good_account.get(
+                    Account.Field.email
+                ),
+                "password1": good_account.get(
+                    Account.Field.password
+                ),
+                "password2": good_account.get(
+                    Account.Field.password
+                )
+            },
+            format="json"
+        )
+
+        # Check result through response code
+        self.assertEqual(response.status_code, HTTP_201_CREATED)
+
+        # Check if account was really created
+        self.assertEqual(Account.objects.count(), 1)
+
+        account = Account.objects.last()
+        self.assertEqual(
+            account.email,
+            good_account.get(
+                Account.Field.email
+            )
+        )
+
+    def test_create_user_duplicate_email(self):
+        # Create user though API call
+        response = self.client.post(
+            reverse("rest_register"),
+            {
+                "email": good_account.get(
+                    Account.Field.email
+                ),
+                "password1": good_account.get(
+                    Account.Field.password
+                ),
+                "password2": good_account.get(
+                    Account.Field.password
+                )
+            },
+            format="json"
+        )
+
+        # Check result through response code
+        self.assertEqual(response.status_code, HTTP_201_CREATED)
+
+        # Create user though API call one more time
+        response = self.client.post(
+            reverse("rest_register"),
+            {
+                "email": good_account.get(
+                    Account.Field.email
+                ),
+                "password1": good_account.get(
+                    Account.Field.password
+                ),
+                "password2": good_account.get(
+                    Account.Field.password
+                )
+            },
+            format="json"
+        )
+
+        # Check result through response code
+        self.assertEqual(response.status_code, HTTP_422_UNPROCESSABLE_ENTITY)
+
+        # check if custom error has been returned
+        self.assertIn(
+            Account.Field.email,
+            response.data
+        )
+        error_object = ErrorDetail(
+            string=ERROR_MSG_DUPLICATE_MAIL,
+            code="invalid"
+        )
+        self.assertIn(
+            error_object,
+            response.data.get(
+                Account.Field.email
+            )
         )
 
 
