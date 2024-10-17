@@ -28,6 +28,8 @@ class Account(AbstractBaseUser, PermissionsMixin, BaseModel):
         # Authorization data
         email: str = "email"
         password: str = "password"
+        password1: str = "password1"
+        password2: str = "password2"
 
         # Account status
         is_active: str = "is_active"

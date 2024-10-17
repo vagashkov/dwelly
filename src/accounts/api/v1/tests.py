@@ -26,17 +26,27 @@ class RegistrationTest(APITestCase):
     Testing registration process with different kinds of data
     """
 
+    def create_good_account(self):
+        # Create user though API call
+        response = self.client.post(
+            reverse("rest_register"),
+            {
+                Account.Field.email: email,
+                Account.Field.password1: password,
+                Account.Field.password2: password
+            },
+            format="json"
+        )
+
+        return response
+
     def test_create_user_no_email(self):
         # Create user though API call
         response = self.client.post(
             reverse("rest_register"),
             {
-                "password1": good_account.get(
-                    Account.Field.password
-                ),
-                "password2": good_account.get(
-                    Account.Field.password
-                )
+                Account.Field.password1: password,
+                Account.Field.password2: password
             },
             format="json"
         )
@@ -56,9 +66,7 @@ class RegistrationTest(APITestCase):
         response = self.client.post(
             reverse("rest_register"),
             {
-                "email": good_account.get(
-                    Account.Field.email
-                ),
+                Account.Field.email: email
             },
             format="json"
         )
@@ -69,11 +77,11 @@ class RegistrationTest(APITestCase):
             HTTP_422_UNPROCESSABLE_ENTITY
         )
         self.assertIn(
-            "password1",
+            Account.Field.password1,
             response.data
         )
         self.assertIn(
-            "password2",
+            Account.Field.password2,
             response.data
         )
 
@@ -82,15 +90,9 @@ class RegistrationTest(APITestCase):
         response = self.client.post(
             reverse("rest_register"),
             {
-                "email": good_account.get(
-                    Account.Field.email
-                ),
-                "password1": good_account.get(
-                    Account.Field.password
-                ),
-                "password2": good_account.get(
-                    Account.Field.password
-                ).upper()
+                Account.Field.email: email,
+                Account.Field.password1: password,
+                Account.Field.password2: password.upper()
 
             },
             format="json"
@@ -113,22 +115,8 @@ class RegistrationTest(APITestCase):
         )
 
     def test_create_user_correct_data(self):
-        # Create user though API call
-        response = self.client.post(
-            reverse("rest_register"),
-            {
-                "email": good_account.get(
-                    Account.Field.email
-                ),
-                "password1": good_account.get(
-                    Account.Field.password
-                ),
-                "password2": good_account.get(
-                    Account.Field.password
-                )
-            },
-            format="json"
-        )
+        # Try to create an account with correct data
+        response = self.create_good_account()
 
         # Check result through response code
         self.assertEqual(response.status_code, HTTP_201_CREATED)
@@ -145,42 +133,14 @@ class RegistrationTest(APITestCase):
         )
 
     def test_create_user_duplicate_email(self):
-        # Create user though API call
-        response = self.client.post(
-            reverse("rest_register"),
-            {
-                "email": good_account.get(
-                    Account.Field.email
-                ),
-                "password1": good_account.get(
-                    Account.Field.password
-                ),
-                "password2": good_account.get(
-                    Account.Field.password
-                )
-            },
-            format="json"
-        )
+        # Try to create an account with correct data
+        response = self.create_good_account()
 
         # Check result through response code
         self.assertEqual(response.status_code, HTTP_201_CREATED)
 
-        # Create user though API call one more time
-        response = self.client.post(
-            reverse("rest_register"),
-            {
-                "email": good_account.get(
-                    Account.Field.email
-                ),
-                "password1": good_account.get(
-                    Account.Field.password
-                ),
-                "password2": good_account.get(
-                    Account.Field.password
-                )
-            },
-            format="json"
-        )
+        # Try to create one more account with the same data
+        response = self.create_good_account()
 
         # Check result through response code
         self.assertEqual(response.status_code, HTTP_422_UNPROCESSABLE_ENTITY)
@@ -222,8 +182,8 @@ class LoginTest(APITestCase):
         self.response = self.client.post(
             reverse("rest_login"),
             {
-                "email": email,
-                "password": password
+                Account.Field.email: email,
+                Account.Field.password: password
             }
         )
 
