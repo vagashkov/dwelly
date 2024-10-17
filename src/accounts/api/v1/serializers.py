@@ -1,7 +1,8 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from rest_framework.serializers import (
-    Serializer, CharField, EmailField,
+    Serializer, ModelSerializer,
+    CharField, EmailField,
     ValidationError, as_serializer_error
 )
 
@@ -120,3 +121,38 @@ class PostSerializer(Serializer):
 
         # Finally return fresh made account object
         return account
+
+
+class ListSerializer(ModelSerializer):
+    """
+    Serializer for accounts list
+    """
+
+    class Meta:
+        """
+        """
+        model = Account
+        fields = [
+            Account.Field.email,
+            Account.Field.is_active,
+            Account.Field.last_login
+        ]
+
+
+class DetailsSerializer(ModelSerializer):
+    """
+     Serializer for account details
+    """
+
+    class Meta:
+        """
+        """
+        model = Account
+        fields = [
+            Account.Field.email,
+            Account.Field.is_active,
+            Account.Field.is_staff,
+            Account.Field.is_superuser,
+            Account.Field.date_joined,
+            Account.Field.last_login
+        ]

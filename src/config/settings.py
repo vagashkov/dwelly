@@ -104,10 +104,19 @@ DATABASES = {
 }
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        # Uncomment to use standard Django authentication
+        "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
-        ),
-    }
+        # Uncomment to use JWT
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    # "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
 
 # Authentication parameters
 AUTH_USER_MODEL = "accounts.Account"

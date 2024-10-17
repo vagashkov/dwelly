@@ -4,6 +4,8 @@ from rest_framework.exceptions import ErrorDetail
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 from rest_framework.test import APITestCase
@@ -15,21 +17,18 @@ from ...constants import (
 from ...models import Account
 from tests.data import good_account
 
-API_URL = "accounts/api/v1/{}"
-
 email = good_account.get(Account.Field.email)
 password = good_account.get(Account.Field.password)
 
 
-class RegistrationTest(APITestCase):
+class CreateAccounts(APITestCase):
     """
-    Testing registration process with different kinds of data
+    Testing accounts list and creation process
     """
-
     def create_good_account(self):
         # Create user though API call
         response = self.client.post(
-            reverse("rest_register"),
+            reverse("rest_accounts"),
             {
                 Account.Field.email: email,
                 Account.Field.password1: password,
@@ -43,7 +42,7 @@ class RegistrationTest(APITestCase):
     def test_create_user_no_email(self):
         # Create user though API call
         response = self.client.post(
-            reverse("rest_register"),
+            reverse("rest_accounts"),
             {
                 Account.Field.password1: password,
                 Account.Field.password2: password
@@ -64,7 +63,7 @@ class RegistrationTest(APITestCase):
     def test_create_user_no_passwords(self):
         # Create user though API call
         response = self.client.post(
-            reverse("rest_register"),
+            reverse("rest_accounts"),
             {
                 Account.Field.email: email
             },
@@ -88,7 +87,7 @@ class RegistrationTest(APITestCase):
     def test_create_user_different_passwords(self):
         # Create user though API call
         response = self.client.post(
-            reverse("rest_register"),
+            reverse("rest_accounts"),
             {
                 Account.Field.email: email,
                 Account.Field.password1: password,
@@ -159,6 +158,103 @@ class RegistrationTest(APITestCase):
             response.data.get(
                 Account.Field.email
             )
+        )
+
+
+class ViewAccounts(APITestCase):
+    """Testing different cases for accounts info access"""
+    def setUp(self) -> None:
+        # create test account
+        Account.objects.create_user(
+            email=email,
+            password=password
+        )
+
+    def test_get_accounts_list_no_auth(self):
+        # checking accounts list access without authentication
+        response = self.client.get(reverse("rest_accounts"))
+
+        self.assertEqual(
+            response.status_code,
+            HTTP_403_FORBIDDEN
+        )
+
+    def test_get_accounts_list_no_admin(self):
+        try:
+            # login as a simple user
+            user = Account.objects.get(id=1)
+            self.client.force_login(user)
+
+            # try to get all accounts list
+            response = self.client.get(reverse("rest_accounts"))
+            self.assertEqual(
+                response.status_code,
+                HTTP_403_FORBIDDEN
+            )
+        except Account.DoesNotExist:
+            pass
+
+    def test_get_accounts_list_admin(self):
+        # checking accounts list access with admin privileges
+        # create admin user
+        admin = Account.objects.create_superuser(
+            email="admin"+email,
+            password=password
+        )
+
+        # login with admin credentials
+        self.client.force_authenticate(admin)
+
+        # now try to obtain users list
+        response = self.client.get(reverse("rest_accounts"))
+        self.assertEqual(
+            response.status_code,
+            HTTP_200_OK
+        )
+
+        # checking accounts number (admin + user = 2)
+        self.assertEqual(
+            len(response.data),
+            2
+        )
+
+    def test_get_account_details(self):
+        # getting the last registered account
+        last_account = Account.objects.latest(
+            Account.Field.date_joined
+        )
+        if last_account:
+            # and checking its details
+            response = self.client.get(
+                reverse(
+                    "rest_account_details",
+                    args=(last_account.id,)
+                )
+            )
+            self.assertEqual(
+                response.status_code,
+                HTTP_200_OK
+            )
+            self.assertIn(
+                Account.Field.email,
+                response.data
+            )
+            self.assertEqual(
+                response.data.get(Account.Field.email),
+                email
+            )
+
+    def test_get_wrong_account_details(self):
+        # checking account details access
+        response = self.client.get(
+            reverse(
+                "rest_account_details",
+                args=(100,)
+            )
+        )
+        self.assertEqual(
+            response.status_code,
+            HTTP_404_NOT_FOUND
         )
 
 
