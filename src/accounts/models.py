@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from phonenumber_field.modelfields import PhoneNumberField
+from django_countries.fields import CountryField
 
 from core.models import BaseModel
 
@@ -103,8 +104,8 @@ class Profile(BaseModel):
         first_name: str = "first_name"
         last_name: str = "last_name"
         full_name: str = "full_name"
-
         phone: str = "phone"
+        country: str = "country"
 
     account: OneToOneField = OneToOneField(
         Account,
@@ -132,6 +133,14 @@ class Profile(BaseModel):
         blank=True,
         default="",
         verbose_name=_("Phone")
+    )
+
+    country: CountryField = CountryField(
+        null=False,
+        blank=True,
+        blank_label="(select country)",
+        default="",
+        verbose_name=_("Country")
     )
 
     def full_name(self):

@@ -46,6 +46,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     # custom fields support
     "phonenumber_field",
+    "django_countries",
 
     # allauth lib support
     "allauth",
