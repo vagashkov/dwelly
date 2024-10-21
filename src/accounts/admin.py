@@ -1,8 +1,14 @@
-from django.contrib import admin
+from django.contrib.admin import site, StackedInline
 from django.contrib.auth.admin import UserAdmin
 
 from .forms import Signup
-from .models import Account
+from .models import Account, Profile
+
+
+class ProfileInline(StackedInline):
+    model = Profile
+    can_delete = True
+    verbose_name = Profile
 
 
 class AccountsAdmin(UserAdmin):
@@ -13,6 +19,8 @@ class AccountsAdmin(UserAdmin):
     model = Account
 
     add_form = Signup
+
+    inlines = (ProfileInline,)
 
     # Fields displayed in users list
     list_display = [
@@ -68,4 +76,4 @@ class AccountsAdmin(UserAdmin):
     )
 
 
-admin.site.register(Account, AccountsAdmin)
+site.register(Account, AccountsAdmin)

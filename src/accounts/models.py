@@ -2,7 +2,9 @@ from django.contrib.auth.models import (
     AbstractBaseUser, PermissionsMixin
 )
 from django.db.models import (
-    BooleanField, EmailField, DateTimeField
+    BooleanField, CharField,
+    EmailField, DateTimeField,
+    OneToOneField, CASCADE
 )
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -85,3 +87,48 @@ class Account(AbstractBaseUser, PermissionsMixin, BaseModel):
     def __str__(self) -> str:
         """ Object string representation """
         return "{}".format(self.email)
+
+
+class Profile(BaseModel):
+    """
+    Manages storing additional user info aka "profile"
+    """
+
+    # define profile attributes list
+    class Field:
+        account: str = "account"
+
+        first_name: str = "first_name"
+        last_name: str = "last_name"
+        full_name: str = "full_name"
+
+    account: OneToOneField = OneToOneField(
+        Account,
+        on_delete=CASCADE
+    )
+
+    first_name = CharField(
+        null=False,
+        blank=True,
+        default="",
+        max_length=150,
+        verbose_name=_("First name")
+    )
+
+    last_name = CharField(
+        null=False,
+        blank=True,
+        default="",
+        max_length=150,
+        verbose_name=_("Last name")
+    )
+
+    def full_name(self):
+        """
+        Return the first_name plus the last_name, with a space in between.
+        """
+        full_name = "{} {}".format(
+            self.first_name,
+            self.last_name
+        )
+        return full_name.strip()

@@ -8,7 +8,7 @@ urlpatterns = [
     ),
     # allauth urls
     path(
-        "",
+        "auth/",
         include("allauth.urls")
     ),
 ]
