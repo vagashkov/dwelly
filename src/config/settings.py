@@ -44,6 +44,9 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    # custom fields support
+    "phonenumber_field",
+
     # allauth lib support
     "allauth",
     "allauth.account",

@@ -5,6 +5,7 @@ Django==5.1.1
 django-allauth==64.2.1
 django-crispy-forms==2.3
 django-filter==24.3
+django-phonenumber-field==8.0.0
 djangorestframework==3.15.2
 environs==11.0.0
 flake8==7.1.1
@@ -12,6 +13,7 @@ Markdown==3.7
 marshmallow==3.22.0
 mccabe==0.7.0
 packaging==24.1
+phonenumbers==8.13.47
 pycodestyle==2.12.1
 pyflakes==3.2.0
 python-dotenv==1.0.1

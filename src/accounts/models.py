@@ -9,6 +9,8 @@ from django.db.models import (
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
+from phonenumber_field.modelfields import PhoneNumberField
+
 from core.models import BaseModel
 
 from .managers import AccountManager
@@ -102,6 +104,8 @@ class Profile(BaseModel):
         last_name: str = "last_name"
         full_name: str = "full_name"
 
+        phone: str = "phone"
+
     account: OneToOneField = OneToOneField(
         Account,
         on_delete=CASCADE
@@ -121,6 +125,13 @@ class Profile(BaseModel):
         default="",
         max_length=150,
         verbose_name=_("Last name")
+    )
+
+    phone: PhoneNumberField = PhoneNumberField(
+        null=False,
+        blank=True,
+        default="",
+        verbose_name=_("Phone")
     )
 
     def full_name(self):
