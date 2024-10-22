@@ -5,6 +5,9 @@ Django settings for dwelly project.
 from environs import Env
 from pathlib import Path
 
+from django.utils.translation import gettext_lazy as _
+
+
 # Build paths inside the project like this: BASE_DIR / "subdir".
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -159,6 +162,19 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+# Supported languages ISO-639-1 codes
+LANGUAGE_GREEK = "el"
+LANGUAGE_ENGLISH = "en"
+LANGUAGE_GERMAN = "de"
+LANGUAGE_RUSSIAN = "ru"
+LANGUAGE_CHOICES = (
+    (LANGUAGE_GREEK, _("Greek")),
+    (LANGUAGE_ENGLISH, _("English")),
+    (LANGUAGE_GERMAN, _("German")),
+    (LANGUAGE_RUSSIAN, _("Russian")),
+)
+DEFAULT_LANGUAGE = LANGUAGE_ENGLISH
+
 # UI styling related settings
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -168,6 +184,10 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
+
+# Media files storage configuration
+MEDIA_ROOT = BASE_DIR.parent.joinpath("media")
+MEDIA_URL = "/media/"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

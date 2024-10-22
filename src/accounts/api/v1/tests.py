@@ -15,7 +15,7 @@ from ...constants import (
     ERROR_MSG_DIFFERENT_PASSWORDS
 )
 from ...models import Account
-from tests.data import good_account
+from tests.user_data import good_account
 
 email = good_account.get(Account.Field.email)
 password = good_account.get(Account.Field.password)

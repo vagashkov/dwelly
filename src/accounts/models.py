@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser, PermissionsMixin
 )
 from django.db.models import (
-    BooleanField, CharField,
-    EmailField, DateTimeField,
+    BooleanField, ImageField,
+    CharField, EmailField, TextField,
+    DateField, DateTimeField,
     OneToOneField, CASCADE
 )
 from django.utils.translation import gettext_lazy as _
@@ -92,6 +94,16 @@ class Account(AbstractBaseUser, PermissionsMixin, BaseModel):
         return "{}".format(self.email)
 
 
+# define location for storing users photo
+def upload_path(instance, filename):
+    return "{}/{}/{}/{}".format(
+        APP_NAME,
+        instance.uuid,
+        "photos",
+        filename
+    )
+
+
 class Profile(BaseModel):
     """
     Manages storing additional user info aka "profile"
@@ -106,6 +118,10 @@ class Profile(BaseModel):
         full_name: str = "full_name"
         phone: str = "phone"
         country: str = "country"
+        language: str = "language"
+        birth_date: str = "birth_date"
+        bio: str = "bio"
+        photo: str = "photo"
 
     account: OneToOneField = OneToOneField(
         Account,
@@ -141,6 +157,36 @@ class Profile(BaseModel):
         blank_label="(select country)",
         default="",
         verbose_name=_("Country")
+    )
+
+    language: CharField = CharField(
+        null=False,
+        blank=True,
+        max_length=len(settings.DEFAULT_LANGUAGE),
+        choices=settings.LANGUAGE_CHOICES,
+        verbose_name=_("Language")
+    )
+
+    birth_date: DateField = DateField(
+        null=True,
+        blank=True,
+        auto_now=False,
+        auto_now_add=False,
+        verbose_name=_("Birthdate")
+    )
+
+    bio: TextField = TextField(
+        null=False,
+        blank=True,
+        default="",
+        verbose_name=_("Bio")
+    )
+
+    photo: ImageField = ImageField(
+        null=True,
+        blank=True,
+        verbose_name=_("Photo"),
+        upload_to=upload_path
     )
 
     def full_name(self):

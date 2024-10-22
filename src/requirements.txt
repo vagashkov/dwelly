@@ -15,6 +15,7 @@ marshmallow==3.22.0
 mccabe==0.7.0
 packaging==24.1
 phonenumbers==8.13.47
+pillow==11.0.0
 pycodestyle==2.12.1
 pyflakes==3.2.0
 python-dotenv==1.0.1
