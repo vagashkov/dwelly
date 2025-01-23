@@ -56,6 +56,7 @@ class AccountTest(TestCase):
         self.assertTrue(account.is_active)
         self.assertFalse(account.is_staff)
         self.assertFalse(account.is_superuser)
+        self.assertIsNotNone(account.public_id)
 
     def test_create_account_duplicate_email(self):
         """

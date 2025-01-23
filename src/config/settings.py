@@ -4,8 +4,9 @@ Django settings for dwelly project.
 """
 
 from pathlib import Path
-
 from environs import Env
+
+from ff3 import FF3Cipher
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,6 +17,11 @@ env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY: str = env.str("SECRET_KEY")
 DEBUG: bool = env.bool("DEBUG", default=False)
+FF3_CIPHER = FF3Cipher(
+            env.str("FF3_KEY"),
+            env.str("FF3_TWEAK")
+        )
+FF3_LENGTH: int = env.int("FF3_LENGTH", 6)
 
 # DOMAINS section
 DOMAIN_NAME: str = env.str("DOMAIN_NAME")

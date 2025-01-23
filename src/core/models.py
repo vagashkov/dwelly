@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import (
     Model, BigAutoField, DateTimeField
 )
@@ -15,6 +16,7 @@ class BaseModel(Model):
 
     class Field:
         id: str = "id"
+        public_id: str = "public_id"
         created_at: str = "created_at"
         updated_at: str = "updated_at"
 
@@ -24,6 +26,19 @@ class BaseModel(Model):
         serialize=False,
         verbose_name=_("ID")
     )
+
+    def _get_public_id(self):
+        """
+        Calculates public_id based on model instance id
+        :return:
+        """
+        return settings.FF3_CIPHER.encrypt(
+            str(self.id).zfill(
+                settings.FF3_LENGTH
+            )
+        )
+
+    public_id = property(_get_public_id)
 
     created_at: DateTimeField = DateTimeField(
         auto_now_add=True,
