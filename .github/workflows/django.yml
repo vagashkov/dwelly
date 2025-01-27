@@ -1,0 +1,41 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.12]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        envkey_DEBUG: True
+        envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        envkey_DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+        envkey_FF3_KEY: ${{ secrets.FF3_KEY }}
+        envkey_FF3_TWEAK: ${{ secrets.FF3_TWEAK }}
+        directory: src
+        file_name: .env
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run Tests
+      run: |
+        python manage.py test
