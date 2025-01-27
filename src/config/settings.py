@@ -4,8 +4,9 @@ Django settings for dwelly project.
 """
 
 from pathlib import Path
-
 from environs import Env
+
+from ff3 import FF3Cipher
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,6 +17,11 @@ env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY: str = env.str("SECRET_KEY")
 DEBUG: bool = env.bool("DEBUG", default=False)
+FF3_CIPHER = FF3Cipher(
+            env.str("FF3_KEY"),
+            env.str("FF3_TWEAK")
+        )
+FF3_LENGTH: int = env.int("FF3_LENGTH", 6)
 
 # DOMAINS section
 DOMAIN_NAME: str = env.str("DOMAIN_NAME")
@@ -34,7 +40,9 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = []
-PROJECT_APPS = []
+PROJECT_APPS = [
+    "accounts.apps.AccountsConfig",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
@@ -76,7 +84,15 @@ DATABASES = {
     }
 }
 
-# Password validation
+# Authentication parameters
+AUTH_USER_MODEL = "accounts.Account"
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa: E501
