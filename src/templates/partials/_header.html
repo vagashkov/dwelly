@@ -1,0 +1,16 @@
+{% load static %}
+<nav class="main_navigator">
+    <!-- Logo -->
+    <a href="{% url 'home' %}">
+        <img src="{% static 'images/logo.png' %}" height=32px>
+    </a>
+    <!-- Top level content  -->
+    <ul>
+        {% if user.is_authenticated %}
+            <a href="{% url 'account_logout' %}">Log Out</a>
+        {% else %}
+            <a href="{% url 'account_login' %}">Sign In</a>
+            <a href="{% url 'account_signup' %}">Sign Up</a>
+        {% endif %}
+    </ul>
+</nav>
