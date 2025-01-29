@@ -43,6 +43,9 @@ THIRD_PARTY_APPS = [
     # allauth lib support
     "allauth",
     "allauth.account",
+    # UI optimizers
+    "crispy_forms",
+    "crispy_bootstrap5",
 ]
 
 PROJECT_APPS = [
@@ -82,6 +85,8 @@ TEMPLATES = [
         },
     },
 ]
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 WSGI_APPLICATION = "config.wsgi.application"
 

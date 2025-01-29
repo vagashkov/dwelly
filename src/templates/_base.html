@@ -14,9 +14,12 @@
     {% include "partials/_header.html" %}
 </header>
 <div class="container">
+    {% include "partials/_messages.html" %}
+</div>
+<div class="container">
     {% block content %}{% endblock content %}
 </div>
-<footer>
+<footer class="container-xxl">
     {% include "partials/_footer.html" %}
 </footer>
 </body>
