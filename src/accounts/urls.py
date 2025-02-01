@@ -6,4 +6,9 @@ urlpatterns = [
         "auth/",
         include("allauth.urls")
     ),
+    # API urls
+    path(
+        "api/",
+        include("accounts.data-api.urls"),
+    ),
 ]

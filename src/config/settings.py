@@ -45,6 +45,8 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     # DRF support
     "rest_framework",
+    "rest_framework.authtoken",
+    "dj_rest_auth",
     "django_filters",
     "drf_spectacular",
     # UI optimizers
