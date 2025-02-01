@@ -1,5 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager
 
+from .constants import ERROR_MSG_NO_EMAIL
+
 
 class AccountManager(BaseUserManager):
     """
@@ -15,7 +17,7 @@ class AccountManager(BaseUserManager):
         """
         # Check if email is provided
         if not email:
-            raise ValueError("User email cannot be empty")
+            raise ValueError(ERROR_MSG_NO_EMAIL)
 
         extra_fields.setdefault("is_active", True)
         user = self.model(

@@ -43,6 +43,12 @@ THIRD_PARTY_APPS = [
     # allauth lib support
     "allauth",
     "allauth.account",
+    # DRF support
+    "rest_framework",
+    "rest_framework.authtoken",
+    "dj_rest_auth",
+    "django_filters",
+    "drf_spectacular",
     # UI optimizers
     "crispy_forms",
     "crispy_bootstrap5",
@@ -129,6 +135,30 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",  # noqa: E501
     },
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        # Uncomment to use standard Django authentication
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+        # Uncomment to use JWT
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ]
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Dwelly project API",
+    "DESCRIPTION": "Simple yet functional asset management system for small/family hotel owners",  # noqa: E501
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 
 
 # Internationalization

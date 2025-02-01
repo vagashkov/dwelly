@@ -16,6 +16,12 @@ urlpatterns = [
         include("accounts.urls")
     ),
 
+    # OpenAPI-related views
+    path(
+        "api-schema/",
+        include("config.api-schema.urls")
+    ),
+
     # homepage
     path("", HomeView.as_view(), name="home")
 ]
