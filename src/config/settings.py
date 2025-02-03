@@ -56,6 +56,7 @@ THIRD_PARTY_APPS = [
 
 PROJECT_APPS = [
     "accounts.apps.AccountsConfig",
+    "blog.apps.BlogConfig"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
@@ -172,6 +173,10 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
+
+# Media files storage configuration
+MEDIA_ROOT = BASE_DIR.parent.joinpath("media")
+MEDIA_URL = "/media/"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

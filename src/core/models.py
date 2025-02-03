@@ -1,6 +1,9 @@
+import uuid
+
 from django.conf import settings
 from django.db.models import (
-    Model, BigAutoField, DateTimeField
+    Model, BigAutoField, UUIDField,
+    CharField, DateTimeField
 )
 from django.utils.translation import gettext_lazy as _
 
@@ -16,6 +19,7 @@ class BaseModel(Model):
 
     class Field:
         id: str = "id"
+        uuid: str = "uuid"
         public_id: str = "public_id"
         created_at: str = "created_at"
         updated_at: str = "updated_at"
@@ -25,6 +29,16 @@ class BaseModel(Model):
         primary_key=True,
         serialize=False,
         verbose_name=_("ID")
+    )
+
+    uuid: UUIDField = UUIDField(
+        null=False,
+        unique=True,
+        editable=False,
+        primary_key=False,
+        auto_created=True,
+        default=uuid.uuid4,
+        verbose_name=_("UUID")
     )
 
     def _get_public_id(self):
@@ -50,3 +64,34 @@ class BaseModel(Model):
         auto_now=True,
         verbose_name=_("Updated at")
     )
+
+
+class Reference(BaseModel):
+    """
+    References base class
+    """
+
+    class Field:
+        name: str = "name"
+        description: str = "description"
+
+    class Meta:
+        abstract = True
+
+    name: str = CharField(
+        null=False,
+        blank=False,
+        max_length=64,
+        verbose_name=_("Name")
+    )
+
+    description: str = CharField(
+        null=False,
+        blank=True,
+        default="",
+        max_length=256,
+        verbose_name=_("Description")
+    )
+
+    def __str__(self):
+        return "{}".format(self.name)
