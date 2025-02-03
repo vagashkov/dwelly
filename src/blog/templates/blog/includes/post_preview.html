@@ -1,0 +1,12 @@
+{% load static %}
+    <div class="card post_card  col-md-3">
+        {% if post.cover %}
+            <img src="{{ post.cover.url}}" alt="{{ post.title }}" class="img-fluid card-img-top">
+        {% endif %}
+        <div class="card-body">
+            <a href="{{ post.get_absolute_url }}">
+                <h3 class="card-title">{{ post.title }}</h3>
+            </a>
+             <p class="card-text">{{ post.excerpt }}</p>
+        </div>
+    </div>

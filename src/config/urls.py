@@ -18,6 +18,12 @@ urlpatterns = [
         include("accounts.urls")
     ),
 
+    # blog application urls
+    path(
+        "blog/",
+        include("blog.urls")
+    ),
+
     # OpenAPI-related views
     path(
         "api-schema/",
