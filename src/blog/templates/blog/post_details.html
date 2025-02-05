@@ -1,50 +1,30 @@
 {% extends "_base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 {% block css_files %}
 {% endblock %}
 {% block title %}{{ post.title }}{% endblock title %}
 {% block content %}
-    <!-- all posts -->
-    <main class="blog-body-content">
-        <div class="container">
-            <h2>{{ post.title }}</h2>
-            {% if post.cover %}
-                <img src="{{ post.cover.url}}" alt="{{ post.title }}" class="img-fluid">
-            {% endif %}
-            <p><small>Last updated on <time>{{ post.updated_at|date:"M d, Y" }}</time> by {{ post.author }}</small></p>
-            <div>
-                {% for category in post.categories.all %}
-                <span>{{ category.name }}</span>
-                {% endfor %}
-            </div>
-            <div class="content">
-                <p> {{ post.excerpt }} </p>
-                {{ post.text|linebreaks }}
-            </div>
+    <!-- posts detail -->
+    <main class="container">
+        <h2>{{ post.title }}</h2>
+        <p class="small text-muted">Last updated on <time>{{ post.updated_at|date:"M d, Y" }}</time> by {{ post.author }}</p>
+        <div class="mb-2">
+            {% for tag in post.tags.all %}
+            <span><small>{{ tag.name }}</small></span>
+            {% endfor %}
+        </div>
+        {% if post.cover %}
+            <img src="{{ post.cover.url}}" alt="{{ post.title }}" class="img-fluid">
+        {% endif %}
+        <div class="mt-2">
+            {{ post.text|linebreaks }}
         </div>
     </main>
     <!-- Enter comment form (for registered users only) -->
     {% if user.is_authenticated %}
-        <section id="comment-form">
-            <form action="{% url 'post_details' post.slug %}" method="POST">
-                {% csrf_token %}
-                {% for field in comment_form %}
-                    <div class="form-control {% if field.errors%}invalid{% endif %}">
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {{ field.errors }}
-                    </div>
-                {% endfor %}
-                <button>Leave comment</button>
-            </form>
-        </section>
+        {% include "blog/includes/comment_form.html" %}
     {% endif %}
     <!-- Previous comments list -->
-    <section id="comments">
-        <ul>
-            {% for comment in post.comments.all %}
-            <li>{{ comment.text|linebreaks }} ({{ comment.author.email }})</li>
-            {% endfor %}
-        </ul>
-    </section>
+    {% include "blog/includes/comments_list.html" %}
 {% endblock content %}

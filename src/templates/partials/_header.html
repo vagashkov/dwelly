@@ -10,13 +10,16 @@
         <button type="button"
                 class="navbar-toggler"
                 data-bs-toggle="collapse"
-                data-bs-target="#mainNavbar">
+                data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <!-- Navigator  -->
         <div class="collapse navbar-collapse" id="mainNavbar">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav mr-auto mb-2">
                 <!-- Top level content  -->
                 <li class="nav-item">
                     <a href="{% url 'blog_home' %}" class="nav-link">News</a>

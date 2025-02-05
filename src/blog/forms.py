@@ -17,3 +17,16 @@ class CommentForm(ModelForm):
         labels = {
             Postable.Field.text: _("Comment:")
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields[
+            Postable.Field.text
+        ].widget.attrs.update(
+            {
+                "cols": "80",
+                "rows": "4",
+                "placeholder": _("Leave your comment here"),
+                "class": "form-control"
+            }
+        )
