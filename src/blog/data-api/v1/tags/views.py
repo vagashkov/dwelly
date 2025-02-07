@@ -1,4 +1,7 @@
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView
+)
 
 from ....models import Tag
 from .permissions import TagPermissions
@@ -11,5 +14,17 @@ class Tags(ListCreateAPIView):
     """
 
     queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = [TagPermissions]
+
+
+class TagDetails(RetrieveUpdateDestroyAPIView):
+    """
+    Manages single tag instance lifecycle
+    """
+
+    queryset = Tag.objects.all()
+    lookup_field = Tag.Field.name
+    lookup_url_kwarg = Tag.Field.name
     serializer_class = TagSerializer
     permission_classes = [TagPermissions]
