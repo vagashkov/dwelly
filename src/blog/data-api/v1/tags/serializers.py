@@ -7,7 +7,7 @@ from ....models import Tag
 
 class TagSerializer(ModelSerializer):
     """
-    Manages Category objects serialization
+    Manages Tag objects serialization
     """
 
     class Meta:

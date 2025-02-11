@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db.models import (
     ForeignKey, PROTECT, CASCADE, ManyToManyField,
-    CharField, TextField, SlugField,
+    BooleanField, CharField, TextField, SlugField,
     ImageField, PositiveSmallIntegerField
 )
 from django.urls import reverse
@@ -35,6 +35,17 @@ class Status(Reference):
     """
     class Meta:
         verbose_name_plural = "statuses"
+
+    class Field:
+        name: str = "name"
+        description: str = "description"
+        is_initial: str = "is_initial"
+
+    is_initial: BooleanField = BooleanField(
+        null=False,
+        blank=True,
+        default=False
+    )
 
 
 class Postable(BaseModel):
