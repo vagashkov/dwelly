@@ -8,5 +8,9 @@ urlpatterns = [
    path(
       "statuses/",
       include("blog.data-api.v1.statuses.urls")
+   ),
+   path(
+      "posts/",
+      include("blog.data-api.v1.posts.urls")
    )
 ]
