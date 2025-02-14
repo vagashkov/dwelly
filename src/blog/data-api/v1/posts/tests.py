@@ -6,6 +6,9 @@ from django.shortcuts import reverse
 
 from rest_framework.status import (
     HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_403_FORBIDDEN,
+    HTTP_422_UNPROCESSABLE_ENTITY
 )
 from rest_framework.test import APITestCase
 
@@ -16,15 +19,26 @@ from ....models import Tag, Status, Postable, Post
 
 email = good_account.get(Account.Field.email)
 password = good_account.get(Account.Field.password)
+mandatory_fields = [
+    Post.Field.title,
+    Post.Field.excerpt,
+    Postable.Field.text
+]
 fields = [
     Post.Field.title,
-    Postable.Field.author,
     Post.Field.excerpt,
+    Postable.Field.author,
     Post.Field.cover,
     Post.Field.tags,
 ]
 list_fields = fields.copy().append(Post.Field.slug)
 details_fields = fields.copy().append(Postable.Field.text)
+
+post_data = {
+    Post.Field.title: "Test title",
+    Post.Field.excerpt: "Test excerpt",
+    Postable.Field.text: "Some test text",
+}
 
 
 class Posts(APITestCase):
@@ -44,19 +58,25 @@ class Posts(APITestCase):
             name="SecondTag"
         )
 
-        author = Account.objects.create(
+        self.standard_user = Account.objects.create(
             email=email,
             password=password
         )
 
+        self.admin_user = Account.objects.create_superuser(
+            email="admin{}".format(email),
+            password=password
+        )
+
         status = Status.objects.create(
-            name="Draft"
+            name="Draft",
+            is_initial=True
         )
 
         # Create first post
         first_post = Post.objects.create(
             title="First",
-            author=author,
+            author=self.admin_user,
             excerpt="First post excerpt",
             text="First post excerpt",
             status=status
@@ -76,7 +96,7 @@ class Posts(APITestCase):
         # Create seconf post
         second_post = Post.objects.create(
             title="Second",
-            author=author,
+            author=self.admin_user,
             excerpt="First post excerpt",
             text="First post excerpt",
             status=status
@@ -141,3 +161,66 @@ class Posts(APITestCase):
                 field,
                 response.data
                 )
+
+    def test_create_no_auth(self):
+        # Check if new post can be created w/o authentication
+        response = self.client.post(
+            reverse("blog_api_posts"),
+            {},
+            format="json"
+        )
+        self.assertEqual(
+            response.status_code,
+            HTTP_403_FORBIDDEN
+        )
+
+    def test_create_standard_user(self):
+        # Check if new post can be created by standard user
+        self.client.force_login(self.standard_user)
+
+        response = self.client.post(
+            reverse("blog_api_posts"),
+            {},
+            format="json"
+        )
+        self.assertEqual(
+            response.status_code,
+            HTTP_403_FORBIDDEN
+        )
+
+    def test_create_no_mandatory_field(self):
+        # Check if new post can be created w/o mandatory fields
+        self.client.force_login(self.admin_user)
+
+        for field in mandatory_fields:
+            bad_data = post_data.copy()
+            del bad_data[field]
+            response = self.client.post(
+                reverse("blog_api_posts"),
+                bad_data,
+                format="json"
+                )
+            self.assertEqual(
+                response.status_code,
+                HTTP_422_UNPROCESSABLE_ENTITY
+                )
+
+    def test_create_post(self):
+        # Check if new post can be created with mandatory fields
+        self.client.force_login(self.admin_user)
+
+        # Getting tag data
+        tags = [
+            tag.id for tag in Tag.objects.all()[:2]
+        ]
+        post_data[Post.Field.tags] = tags
+
+        response = self.client.post(
+            reverse("blog_api_posts"),
+            post_data,
+            format="json"
+            )
+        self.assertEqual(
+            response.status_code,
+            HTTP_201_CREATED
+            )

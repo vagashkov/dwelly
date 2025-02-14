@@ -42,7 +42,7 @@ class GetListSerializer(GetRelatedFields):
 
 class GetDetailsSerializer(GetRelatedFields):
     """
-    Manages blog objects list serialization
+    Manages blog object details serialization
     """
 
     class Meta:
@@ -52,6 +52,21 @@ class GetDetailsSerializer(GetRelatedFields):
             Postable.Field.author,
             Post.Field.excerpt,
             Post.Field.cover,
+            Post.Field.tags,
+            Postable.Field.text
+            ]
+
+
+class PostSerializer(ModelSerializer):
+    """
+    Manages blog object creation
+    """
+
+    class Meta:
+        model = Post
+        fields = [
+            Post.Field.title,
+            Post.Field.excerpt,
             Post.Field.tags,
             Postable.Field.text
             ]
