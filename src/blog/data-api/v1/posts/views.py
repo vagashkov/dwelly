@@ -6,8 +6,10 @@ from rest_framework.generics import (
 )
 from rest_framework.response import Response
 from rest_framework.status import (
+    HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_202_ACCEPTED,
+    HTTP_204_NO_CONTENT,
     HTTP_404_NOT_FOUND,
     HTTP_415_UNSUPPORTED_MEDIA_TYPE,
     HTTP_422_UNPROCESSABLE_ENTITY,
@@ -118,6 +120,43 @@ class PostCover(APIView):
 
     permission_classes = [PostPermissions]
 
+    def get(self, request, slug):
+        """
+        Returns post cover
+        :param request:
+        :param slug:
+        :return:
+        """
+
+        # Check if target post exists
+        try:
+            post = Post.objects.get(slug=slug)
+        except Post.DoesNotExist:
+            return Response(
+                status=HTTP_404_NOT_FOUND,
+                data={
+                    ERROR_KEY:
+                        ERROR_MSG_NO_POST
+                }
+            )
+        except Post.MultipleObjectsReturned:
+            return Response(
+                status=HTTP_422_UNPROCESSABLE_ENTITY,
+                data={
+                    ERROR_KEY:
+                        ERROR_MSG_MULTIPLE_POSTS.format(
+                            slug
+                        )
+                }
+            )
+
+        return Response(
+            {
+                Post.Field.cover: post.cover.url
+            },
+            status=HTTP_200_OK
+        )
+
     def post(self, request, slug):
         """
         Post cover creation
@@ -184,4 +223,41 @@ class PostCover(APIView):
 
         return Response(
             status=HTTP_202_ACCEPTED,
+        )
+
+    def delete(self, request, slug):
+        """
+        Removes post cover
+        :param request:
+        :param slug:
+        :return:
+        """
+
+        # Check if target post exists
+        try:
+            post = Post.objects.get(slug=slug)
+        except Post.DoesNotExist:
+            return Response(
+                status=HTTP_404_NOT_FOUND,
+                data={
+                    ERROR_KEY:
+                        ERROR_MSG_NO_POST
+                }
+            )
+        except Post.MultipleObjectsReturned:
+            return Response(
+                status=HTTP_422_UNPROCESSABLE_ENTITY,
+                data={
+                    ERROR_KEY:
+                        ERROR_MSG_MULTIPLE_POSTS.format(
+                            slug
+                        )
+                }
+            )
+
+        post.cover = None
+        post.save()
+
+        return Response(
+            status=HTTP_204_NO_CONTENT,
         )

@@ -8,6 +8,7 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_202_ACCEPTED,
+    HTTP_204_NO_CONTENT,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_415_UNSUPPORTED_MEDIA_TYPE,
@@ -99,26 +100,28 @@ class Posts(APITestCase):
             content_type="image/jpeg"
         )
         img_content.flush()
+        self.first_post.save()
 
         # Create seconf post
-        second_post = Post.objects.create(
+        self.second_post = Post.objects.create(
             title="Second",
             author=self.admin_user,
             excerpt="First post excerpt",
             text="First post excerpt",
             status=self.initial_status
         )
-        second_post.tags.add(self.first_tag)
+        self.second_post.tags.add(self.first_tag)
 
         # Create second post cover
         img_content = io.BytesIO()
         image = Image.new("RGB", size=(800, 600), color=(0, 155, 0))
         image.save(img_content, "JPEG")
-        second_post.cover = SimpleUploadedFile(
+        self.second_post.cover = SimpleUploadedFile(
             name="second_post_cover.jpeg",
             content=img_content.getvalue(),
             content_type="image/jpeg"
         )
+        self.second_post.save()
         img_content.flush()
 
     def test_posts_list(self):
@@ -150,7 +153,7 @@ class Posts(APITestCase):
             reverse(
                 "blog_api_post_details",
                 kwargs={
-                    Post.Field.slug: Post.objects.all()[0].slug
+                    Post.Field.slug: self.first_post.slug
                 }
             ),
         )
@@ -346,4 +349,46 @@ class Posts(APITestCase):
         self.assertEqual(
             response.status_code,
             HTTP_202_ACCEPTED
+        )
+
+    def test_get_post_cover(self):
+        response = self.client.get(
+            reverse(
+                "blog_api_post_cover",
+                kwargs={
+                    Post.Field.slug: self.first_post.slug
+                }
+            ),
+        )
+
+        # Check results through response code
+        self.assertEqual(
+            response.status_code,
+            HTTP_200_OK
+        )
+
+        # Check received data
+        self.assertIn(
+            Post.Field.cover,
+            response.data
+            )
+
+    def test_delete_post_cover(self):
+        # Checking post cover delete routine
+
+        # Trying to upload post cover
+        self.client.force_login(self.admin_user)
+        response = self.client.delete(
+            reverse(
+                "blog_api_post_cover",
+                kwargs={
+                    Post.Field.slug: self.first_post.slug
+                }
+            ),
+        )
+
+        # Time to evaluate result
+        self.assertEqual(
+            response.status_code,
+            HTTP_204_NO_CONTENT
         )
