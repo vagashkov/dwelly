@@ -1,3 +1,5 @@
+import PIL
+from PIL import Image
 from pydantic import ValidationError
 from rest_framework.generics import (
     ListCreateAPIView, RetrieveUpdateDestroyAPIView
@@ -5,11 +7,20 @@ from rest_framework.generics import (
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_201_CREATED,
+    HTTP_202_ACCEPTED,
+    HTTP_404_NOT_FOUND,
+    HTTP_415_UNSUPPORTED_MEDIA_TYPE,
     HTTP_422_UNPROCESSABLE_ENTITY,
 )
+from rest_framework.views import APIView
 
 from ....constants import (
+    ERROR_KEY,
     ERROR_MSG_NO_INITIAL_STATUS,
+    ERROR_MSG_NO_IMAGE_ATTACHED,
+    ERROR_MSG_UNSUPPORTED_IMAGE_FORMAT,
+    ERROR_MSG_NO_POST,
+    ERROR_MSG_MULTIPLE_POSTS
 )
 from ....models import Post, Status
 from .permissions import PostPermissions
@@ -98,3 +109,79 @@ class PostDetails(RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = Post.Field.slug
     serializer_class = GetDetailsSerializer
     permission_classes = [PostPermissions]
+
+
+class PostCover(APIView):
+    """
+    Separate view for blog post cover management
+    """
+
+    permission_classes = [PostPermissions]
+
+    def post(self, request, slug):
+        """
+        Post cover creation
+        :param request:
+        :return:
+        """
+
+        # First check if photo is attached
+        try:
+            cover = request.data[Post.Field.cover]
+        except KeyError:
+            return Response(
+                status=HTTP_422_UNPROCESSABLE_ENTITY,
+                data={
+                    ERROR_KEY:
+                        ERROR_MSG_NO_IMAGE_ATTACHED
+                }
+            )
+
+        # Check cover format
+        try:
+            img = Image.open(cover)
+        except PIL.UnidentifiedImageError:
+            return Response(
+                status=HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+                data={
+                    ERROR_KEY:
+                        ERROR_MSG_UNSUPPORTED_IMAGE_FORMAT
+                }
+            )
+        if img.format not in ["JPEG", "PNG"]:
+            return Response(
+                status=HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+                data={
+                    ERROR_KEY:
+                        ERROR_MSG_UNSUPPORTED_IMAGE_FORMAT
+                }
+            )
+
+        # Second check if target post exists
+        try:
+            post = Post.objects.get(slug=slug)
+        except Post.DoesNotExist:
+            return Response(
+                status=HTTP_404_NOT_FOUND,
+                data={
+                    ERROR_KEY:
+                        ERROR_MSG_NO_POST
+                }
+            )
+        except Post.MultipleObjectsReturned:
+            return Response(
+                status=HTTP_422_UNPROCESSABLE_ENTITY,
+                data={
+                    ERROR_KEY:
+                        ERROR_MSG_MULTIPLE_POSTS.format(
+                            slug
+                        )
+                }
+            )
+
+        post.cover = cover
+        post.save()
+
+        return Response(
+            status=HTTP_202_ACCEPTED,
+        )

@@ -7,7 +7,10 @@ from django.shortcuts import reverse
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
+    HTTP_202_ACCEPTED,
     HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+    HTTP_415_UNSUPPORTED_MEDIA_TYPE,
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 from rest_framework.test import APITestCase
@@ -51,10 +54,11 @@ class Posts(APITestCase):
         Pre-create some posts to browse
         :return:
         """
-        first_tag = Tag.objects.create(
+        self.first_tag = Tag.objects.create(
             name="FirstTag"
         )
-        second_tag = Tag.objects.create(
+
+        self.second_tag = Tag.objects.create(
             name="SecondTag"
         )
 
@@ -68,25 +72,28 @@ class Posts(APITestCase):
             password=password
         )
 
-        status = Status.objects.create(
+        self.initial_status = Status.objects.create(
             name="Draft",
             is_initial=True
         )
 
         # Create first post
-        first_post = Post.objects.create(
+        self.first_post = Post.objects.create(
             title="First",
             author=self.admin_user,
             excerpt="First post excerpt",
             text="First post excerpt",
-            status=status
+            status=self.initial_status
         )
-        first_post.tags.add(first_tag, second_tag)
+        self.first_post.tags.add(
+            self.first_tag,
+            self.second_tag
+        )
         # Create first post cover
         img_content = io.BytesIO()
         image = Image.new("RGB", size=(800, 600), color=(155, 0, 0))
         image.save(img_content, "JPEG")
-        first_post.cover = SimpleUploadedFile(
+        self.first_post.cover = SimpleUploadedFile(
             name="first_post_cover.jpeg",
             content=img_content.getvalue(),
             content_type="image/jpeg"
@@ -99,9 +106,9 @@ class Posts(APITestCase):
             author=self.admin_user,
             excerpt="First post excerpt",
             text="First post excerpt",
-            status=status
+            status=self.initial_status
         )
-        second_post.tags.add(first_tag)
+        second_post.tags.add(self.first_tag)
 
         # Create second post cover
         img_content = io.BytesIO()
@@ -224,3 +231,119 @@ class Posts(APITestCase):
             response.status_code,
             HTTP_201_CREATED
             )
+
+    def test_create_post_cover_no_image(self):
+        # Checking post cover upload routine
+        # without cover attached
+
+        self.client.force_login(self.admin_user)
+
+        response = self.client.post(
+            reverse(
+                "blog_api_post_cover",
+                kwargs={
+                    Post.Field.slug: self.first_post.slug
+                }
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            HTTP_422_UNPROCESSABLE_ENTITY
+        )
+
+    def test_create_unknown_post_cover(self):
+        # Checking post cover upload routine
+        # for non-existing post
+
+        # Create post cover
+        img_content = io.BytesIO()
+        image = Image.new("RGB", size=(800, 600), color=(0, 155, 0))
+        image.save(img_content, "JPEG")
+        img_content.name = "cover.jpg"
+        img_content.seek(0)
+
+        # Trying to upload post cover
+        self.client.force_login(self.admin_user)
+        response = self.client.post(
+            reverse(
+                "blog_api_post_cover",
+                kwargs={
+                    Post.Field.slug: "abracadabra"
+                }
+            ),
+            {
+                Post.Field.cover: img_content
+            },
+            format="multipart"
+        )
+        img_content.flush()
+
+        # Time to evaluate result
+        self.assertEqual(
+            response.status_code,
+            HTTP_404_NOT_FOUND
+        )
+
+    def test_create_post_non_image_cover(self):
+        # Checking post cover upload routine
+        # for upsupported image format
+
+        # Create post cover
+        img_content = io.BytesIO(b"Definitely not an image!")
+        img_content.name = "cover.jpg"
+        img_content.seek(0)
+
+        # Trying to upload post cover
+        self.client.force_login(self.admin_user)
+        response = self.client.post(
+            reverse(
+                "blog_api_post_cover",
+                kwargs={
+                    Post.Field.slug: self.first_post.slug
+                }
+            ),
+            {
+                Post.Field.cover: img_content
+            },
+            format="multipart"
+        )
+        img_content.flush()
+
+        # Time to evaluate result
+        self.assertEqual(
+            response.status_code,
+            HTTP_415_UNSUPPORTED_MEDIA_TYPE
+        )
+
+    def test_create_post_cover(self):
+        # Checking post cover upload routine
+
+        # Create post cover
+        img_content = io.BytesIO()
+        image = Image.new("RGB", size=(800, 600), color=(0, 155, 0))
+        image.save(img_content, "JPEG")
+        img_content.name = "cover.jpg"
+        img_content.seek(0)
+
+        # Trying to upload post cover
+        self.client.force_login(self.admin_user)
+        response = self.client.post(
+            reverse(
+                "blog_api_post_cover",
+                kwargs={
+                    Post.Field.slug: self.first_post.slug
+                }
+            ),
+            {
+                Post.Field.cover: img_content
+            },
+            format="multipart"
+        )
+        img_content.flush()
+
+        # Time to evaluate result
+        self.assertEqual(
+            response.status_code,
+            HTTP_202_ACCEPTED
+        )
