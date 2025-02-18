@@ -1,0 +1,15 @@
+<section id="comments" class="comments-list">
+  {% for comment in post.comments.all %}
+      <div class="card w-100 mt-2">
+        <div class="card-body">
+          <p class="card-title fw-bold">{{ comment.author.email }}</p>
+          <p class="card-text">{{ comment.text|linebreaks }}</p>
+        </div>
+      </div>
+  {% endfor %}
+</section>
+
+
+
+
+

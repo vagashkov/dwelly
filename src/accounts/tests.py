@@ -4,10 +4,7 @@ from django.urls import reverse
 
 from .models import Account
 
-good_account = {
-    Account.Field.email: "newuser@email.com",
-    Account.Field.password: "S0meStr0ngPaSSw0rd",
-}
+from tests.data import good_account
 
 email = good_account.get(Account.Field.email)
 password = good_account.get(Account.Field.password)

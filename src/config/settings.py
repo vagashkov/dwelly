@@ -3,6 +3,8 @@ Django settings for dwelly project.
 
 """
 
+from socket import gethostname, gethostbyname_ex
+
 from pathlib import Path
 from environs import Env
 
@@ -29,6 +31,12 @@ ALLOWED_HOSTS = [
     DOMAIN_NAME,
 ]
 
+# define internal ips list for debug toolbar with Docker support
+hostname, aliases, ips = gethostbyname_ex(gethostname())
+INTERNAL_IPS = [
+    ".".join(ip.split(".")[:-1] + ["1"]) for ip in ips
+]
+
 # Application definition
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -52,15 +60,20 @@ THIRD_PARTY_APPS = [
     # UI optimizers
     "crispy_forms",
     "crispy_bootstrap5",
+    # development tools
+    "debug_toolbar",
 ]
 
 PROJECT_APPS = [
     "accounts.apps.AccountsConfig",
+    "blog.apps.BlogConfig"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
+    # debug support middleware
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -172,6 +185,10 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
+
+# Media files storage configuration
+MEDIA_ROOT = BASE_DIR.parent.joinpath("media")
+MEDIA_URL = "/media/"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
