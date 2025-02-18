@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import Posts, PostDetails, PostCover
+from .comments.views import Comments
 
 urlpatterns = [
     path(
@@ -12,6 +13,11 @@ urlpatterns = [
         "<slug:slug>/cover",
         PostCover.as_view(),
         name="blog_api_post_cover"
+    ),
+    path(
+        "<slug:slug>/comments",
+        Comments.as_view(),
+        name="blog_api_post_comments"
     ),
     path(
         "",

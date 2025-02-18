@@ -60,7 +60,7 @@ class Posts(ListCreateAPIView):
                 status=HTTP_422_UNPROCESSABLE_ENTITY,
                 # Leave only first error message for every field
                 data={
-                    "errors": error.errors()
+                    ERROR_KEY: error.errors()
                 }
             )
 
@@ -78,7 +78,7 @@ class Posts(ListCreateAPIView):
                 status=HTTP_422_UNPROCESSABLE_ENTITY,
                 # Leave only first error message for every field
                 data={
-                    "errors": ERROR_MSG_NO_INITIAL_STATUS
+                    ERROR_KEY: ERROR_MSG_NO_INITIAL_STATUS
                 }
             )
 
