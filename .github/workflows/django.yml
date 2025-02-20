@@ -15,6 +15,16 @@ jobs:
       matrix:
         python-version: [3.12]
 
+    services:
+      db:
+        image: postgres
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -26,6 +36,10 @@ jobs:
         envkey_DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
         envkey_FF3_KEY: ${{ secrets.FF3_KEY }}
         envkey_FF3_TWEAK: ${{ secrets.FF3_TWEAK }}
+        envkey_POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+        envkey_POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        envkey_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         directory: src
         file_name: .env
     - name: Set up Python ${{ matrix.python-version }}
