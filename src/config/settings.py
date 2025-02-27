@@ -178,6 +178,9 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
+# Default location settings
+DEFAULT_COUNTRY = "BY"
+
 
 # Internationalization
 LANGUAGE_CODE = "en-us"

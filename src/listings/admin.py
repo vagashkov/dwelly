@@ -5,21 +5,40 @@ from django.contrib.admin import (
 from core.models import Reference
 
 from .models import (
-    ObjectType, Category, Amenity, HouseRule
+    ObjectType, Category, Amenity, HouseRule, Listing
 )
 
 APP_NAME = "listings"
 
 
-class ObjectTypeAdmin(ModelAdmin):
+class ReferenceAdmin(ModelAdmin):
     """
-    Simple class for editing object types using admin panel
+    Base admin class for reference objects
     """
+    def listings_count(self, object_type):
+        return object_type.listings.count()
+
+    listings_count.short_description = "Listings"
 
     list_display = (
         Reference.Field.name,
-        Reference.Field.description
+        Reference.Field.description,
+        "listings_count"
     )
+
+
+class ObjectTypeAdmin(ReferenceAdmin):
+    """
+    Simple class for editing object types using admin panel
+    """
+    pass
+
+
+class HouseRuleAdmin(ReferenceAdmin):
+    """
+    Simple class for editing house rules using admin panel
+    """
+    pass
 
 
 class CategoryAdmin(ModelAdmin):
@@ -29,7 +48,8 @@ class CategoryAdmin(ModelAdmin):
 
     list_display = (
         Reference.Field.name,
-        Reference.Field.description
+        Reference.Field.description,
+
     )
 
 
@@ -38,20 +58,36 @@ class AmenityAdmin(ModelAdmin):
     Simple class for editing amenities using admin panel
     """
 
+    def listings_count(self, object_type):
+        return object_type.listings.count()
+
+    listings_count.short_description = "Listings"
+
     list_display = (
         Reference.Field.name,
-        Reference.Field.description
+        Reference.Field.description,
+        "category",
+        "listings_count",
     )
 
 
-class HouseRuleAdmin(ModelAdmin):
+class ListingAdmin(ModelAdmin):
     """
-    Simple class for editing house rules using admin panel
+    Simple class for editing listings using admin panel
     """
 
     list_display = (
-        Reference.Field.name,
-        Reference.Field.description
+        Listing.Field.title,
+        Listing.Field.object_type,
+        Listing.Field.country,
+        Listing.Field.city
+    )
+
+    list_filter = (
+        "{}__name".format(
+            Listing.Field.object_type
+        ),
+        Listing.Field.country,
     )
 
 
@@ -59,3 +95,4 @@ site.register(ObjectType, ObjectTypeAdmin)
 site.register(Category, CategoryAdmin)
 site.register(Amenity, AmenityAdmin)
 site.register(HouseRule, HouseRuleAdmin)
+site.register(Listing, ListingAdmin)
