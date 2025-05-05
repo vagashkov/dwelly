@@ -12,8 +12,8 @@ services:
       - .:/src
     depends_on:
       - db
-    command: >      
-      sh -c "python manage.py test"
+    command: >
+      sh -c "flake8 . && python manage.py test"
   db:
     image: postgres:14.17-bookworm
     restart: always
