@@ -1,6 +1,7 @@
 asgiref==3.8.1
 attrs==25.3.0
 Django==5.2
+django-allauth==65.7.0
 ff3==1.0.2
 flake8==7.2.0
 flake8-annotations==3.1.1
