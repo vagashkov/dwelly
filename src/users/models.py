@@ -2,14 +2,21 @@ from django.contrib.auth.models import (
     AbstractBaseUser, PermissionsMixin
 )
 from django.db.models import (
-    EmailField, BooleanField, DateTimeField
+    CharField, EmailField, TextField,
+    BooleanField, DateTimeField,
+    OneToOneField, CASCADE, ImageField
 )
+from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+from phonenumber_field.modelfields import PhoneNumberField
 
 from core.models import BaseModel
 
 from .managers import UserManager
+
+APP_NAME = "users"
 
 
 class User(AbstractBaseUser, PermissionsMixin, BaseModel):
@@ -78,3 +85,94 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     def __str__(self) -> str:
         """ Object string representation """
         return "{}".format(self.email)
+
+
+# define location for storing users photo
+def upload_path(instance: "Profile", filename: str) -> str:
+    return "{}/{}/{}/{}".format(
+        APP_NAME,
+        instance.user.uuid,
+        "photos",
+        filename
+    )
+
+
+class Profile(BaseModel):
+    """
+    Manages storing additional user info aka "profile"
+    """
+
+    # define profile attributes list
+    class Field:
+        user: str = "user"
+        first_name: str = "first_name"
+        last_name: str = "last_name"
+        full_name: str = "full_name"
+        phone: str = "phone"
+        bio: str = "bio"
+        photo: str = "photo"
+
+    user: OneToOneField = OneToOneField(
+        User,
+        related_name="profile",
+        on_delete=CASCADE
+    )
+
+    first_name = CharField(
+        null=False,
+        blank=True,
+        default="",
+        max_length=150,
+        verbose_name=_("First name")
+    )
+
+    last_name = CharField(
+        null=False,
+        blank=True,
+        default="",
+        max_length=150,
+        verbose_name=_("Last name")
+    )
+
+    phone: PhoneNumberField = PhoneNumberField(
+        null=False,
+        blank=True,
+        default="",
+        verbose_name=_("Phone")
+    )
+
+    bio: TextField = TextField(
+        null=False,
+        blank=True,
+        default="",
+        verbose_name=_("Bio")
+    )
+
+    photo: ImageField = ImageField(
+        null=True,
+        blank=True,
+        verbose_name=_("Photo"),
+        upload_to=upload_path
+    )
+
+    def full_name(self) -> str:
+        """
+        Return the first_name plus the last_name, with a space in between.
+        """
+        full_name = "{} {}".format(
+            self.first_name,
+            self.last_name
+        )
+        return full_name.strip()
+
+    def get_absolute_url(self) -> str:
+        return reverse(
+            "profile",
+            kwargs={
+                "public_id": self.public_id
+            }
+        )
+
+    def __str__(self) -> str:
+        """ Object string representation """
+        return "{}".format(self.full_name())

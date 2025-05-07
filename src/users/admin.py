@@ -1,7 +1,13 @@
-from django.contrib.admin import site
+from django.contrib.admin import site, StackedInline
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User
+from .models import User, Profile
+
+
+class ProfileInline(StackedInline):
+    model = Profile
+    can_delete = True
+    verbose_name = Profile
 
 
 class UsersAdmin(UserAdmin):
@@ -17,6 +23,10 @@ class UsersAdmin(UserAdmin):
         User.Field.email,
         User.Field.last_login,
     ]
+
+    inlines = (
+        ProfileInline,
+    )
 
     ordering = (
         User.Field.email,

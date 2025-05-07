@@ -1,26 +1,43 @@
+from PIL import Image
+
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import User
+from .models import User, Profile
 
-good_account = {
+good_user = {
     User.Field.email: "test@email.com",
     User.Field.password: "S0meStr0ngPaSSw0rd",
 }
 
-email = good_account.get(User.Field.email)
-password = good_account.get(User.Field.password)
+good_profile = {
+    Profile.Field.first_name: "Some",
+    Profile.Field.last_name: "User",
+    Profile.Field.phone: "+302374071345",
+    Profile.Field.bio: "Some test user"
+}
+
+email = good_user.get(User.Field.email)
+password = good_user.get(User.Field.password)
 
 
 class UserTest(TestCase):
     """
-    Manages account and profile data compliance tests
+    Manages user and profile data compliance tests
     """
 
-    def test_create_account_no_email(self) -> None:
+    def create_good_user(self) -> User:
+        # create new user
+        return User.objects.create_user(
+            email=email,
+            password=password
+        )
+
+    def test_create_user_no_email(self) -> None:
         """
-        Test if user account can be created with empty email
+        Test if user user can be created with empty email
         :return:
         """
         try:
@@ -31,9 +48,9 @@ class UserTest(TestCase):
         except ValueError:
             self.assertRaises(ValueError)
 
-    def test_create_account_no_password(self) -> None:
+    def test_create_user_no_password(self) -> None:
         """
-        Test if user account can be created with empty password
+        Test if user user can be created with empty password
         :return:
         """
         try:
@@ -44,23 +61,80 @@ class UserTest(TestCase):
         except ValueError:
             self.assertRaises(ValueError)
 
-    def test_create_standard_account(self) -> None:
+    def test_create_standard_user(self) -> None:
         """
-        Create new account with all data needed
+        Create new user with all data needed
         :return:
         """
-        account = User.objects.create_user(
-            email=email,
-            password=password
-        )
-        self.assertTrue(account.is_active)
-        self.assertFalse(account.is_staff)
-        self.assertFalse(account.is_superuser)
-        self.assertIsNotNone(account.public_id)
+        user = self.create_good_user()
+        self.assertTrue(user.is_active)
+        self.assertFalse(user.is_staff)
+        self.assertFalse(user.is_superuser)
+        self.assertIsNotNone(user.public_id)
 
-    def test_create_account_duplicate_email(self) -> None:
+    def test_user_profile(self) -> None:
         """
-        Check if user account can be created
+        Check user profile data
+        :return:
+        """
+        profile = self.create_good_user().profile
+
+        # check if new profile was created
+        self.assertIsNotNone(profile)
+
+    def test_fill_profile_data(self) -> None:
+        """
+        Check user profile data
+        :return:
+        """
+        profile = self.create_good_user().profile
+
+        # fill profile with test data
+        for key in good_profile.keys():
+            profile.__setattr__(
+                key,
+                good_profile.get(key)
+            )
+
+        # check if profile was filled correctly
+        for key in good_profile.keys():
+            self.assertEqual(
+                profile.__getattribute__(key),
+                good_profile.get(key)
+            )
+
+    def test_fill_profile_photo(self) -> None:
+        """
+        Check user profile photo
+        :return:
+        """
+
+        profile = self.create_good_user().profile
+
+        image = Image.new(
+            "RGB",
+            size=(2000, 2000),
+            color=(155, 0, 0)
+        )
+
+        # finally check profile photo field
+        profile.photo = SimpleUploadedFile(
+            name="profile_photo.jpg",
+            content=image.tobytes(),
+            content_type="image/jpeg"
+        )
+        self.assertIsNotNone(profile.photo)
+
+    def test_bad_phone(self) -> None:
+        # check phone format verification
+        try:
+            self.create_good_user().profile.phone = "zz"
+        except TypeError:
+            self.assertRaises(TypeError)
+
+    def test_create_user_duplicate_email(self) -> None:
+        """
+        Check if user user can be created
         with duplicate email
         :return:
         """
@@ -81,14 +155,14 @@ class UserTest(TestCase):
         Test staff user creation
         :return:
         """
-        account = User.objects.create_user(
+        user = User.objects.create_user(
             email=email,
             password=password,
             is_staff=True
         )
-        self.assertTrue(account.is_active)
-        self.assertTrue(account.is_staff)
-        self.assertFalse(account.is_superuser)
+        self.assertTrue(user.is_active)
+        self.assertTrue(user.is_staff)
+        self.assertFalse(user.is_superuser)
 
     def test_create_superuser(self) -> None:
         """
@@ -96,13 +170,13 @@ class UserTest(TestCase):
         :return:
         """
 
-        account = User.objects.create_superuser(
+        user = User.objects.create_superuser(
             email=email,
             password=password
         )
-        self.assertTrue(account.is_active)
-        self.assertTrue(account.is_staff)
-        self.assertTrue(account.is_superuser)
+        self.assertTrue(user.is_active)
+        self.assertTrue(user.is_staff)
+        self.assertTrue(user.is_superuser)
 
 
 class SignUpPage(TestCase):
