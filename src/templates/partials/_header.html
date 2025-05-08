@@ -48,6 +48,7 @@
                             aria-expanded="false">User</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         {% if user.is_authenticated %}
+                            <a href="{% url 'user_display_profile' %}" class="dropdown-item">Profile</a>
                             <a href="{% url 'account_logout' %}" class="dropdown-item">Log Out</a>
                         {% else %}
                             <a href="{% url 'account_login' %}" class="dropdown-item">Log In</a>

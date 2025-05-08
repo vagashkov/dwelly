@@ -6,4 +6,9 @@ urlpatterns = [
         "auth/",
         include("allauth.urls")
     ),
+    # profile urls
+    path(
+        "profile/",
+        include("users.profile.urls")
+        ),
 ]
