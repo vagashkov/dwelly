@@ -11,4 +11,9 @@ urlpatterns = [
         "profile/",
         include("users.profile.urls")
         ),
+    # API urls
+    path(
+        "api/",
+        include("users.api.urls"),
+    ),
 ]

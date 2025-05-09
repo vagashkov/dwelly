@@ -23,6 +23,10 @@ THIRD_PARTY_APPS = [
     # UI optimizers
     "crispy_forms",
     "crispy_bootstrap5",
+    # DRF support
+    "rest_framework",
+    "rest_framework.authtoken",
+    "dj_rest_auth",
 ]
 PROJECT_APPS = [
     "users.apps.UsersConfig",
@@ -97,6 +101,23 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",  # noqa: E501
     },
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        # Uncomment to use standard Django authentication
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+        # Uncomment to use JWT
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    # "DEFAULT_FILTER_BACKENDS": [
+    #     "django_filters.rest_framework.DjangoFilterBackend",
+    # ]
+}
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
