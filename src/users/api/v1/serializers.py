@@ -13,8 +13,7 @@ from ...constants import (
     ERROR_ALLAUTH_NOT_INSTALLED
 )
 
-
-from ...models import User
+from ...models import User, Profile
 
 try:
     from allauth.account.adapter import get_adapter
@@ -158,4 +157,61 @@ class UsersList(ModelSerializer):
             User.Field.email,
             User.Field.is_active,
             User.Field.last_login
+        ]
+
+
+class ProfilesList(ModelSerializer):
+    """
+    Serializer for profiles list
+    """
+
+    user = UsersList(required=True)
+
+    class Meta:
+        """
+        """
+        model = Profile
+        fields = [
+            Profile.Field.user,
+            Profile.Field.full_name,
+            Profile.Field.photo
+        ]
+
+
+class ProfileGet(ModelSerializer):
+    """
+    Serializer for getting single profile object details
+    """
+
+    user = UserGet(required=True)
+
+    class Meta:
+        """
+        """
+        model = Profile
+        fields = [
+            Profile.Field.user,
+            Profile.Field.first_name,
+            Profile.Field.last_name,
+            Profile.Field.phone,
+            Profile.Field.bio,
+            Profile.Field.photo,
+        ]
+
+
+class ProfilePatch(ModelSerializer):
+    """
+    Serializer for single user data update
+    """
+
+    class Meta:
+        """
+        """
+        model = Profile
+        fields = [
+            Profile.Field.first_name,
+            Profile.Field.last_name,
+            Profile.Field.phone,
+            Profile.Field.bio,
+            Profile.Field.photo,
         ]
