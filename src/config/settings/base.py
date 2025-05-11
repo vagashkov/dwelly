@@ -27,6 +27,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "dj_rest_auth",
+    "drf_spectacular",
 ]
 PROJECT_APPS = [
     "users.apps.UsersConfig",
@@ -115,6 +116,15 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+# drf_spectacular-related settings
+SPECTACULAR_SETTINGS = {
+    "TITLE": "PetHotel project API",
+    "DESCRIPTION": "Simple yet functional pet kennel asset management system",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
