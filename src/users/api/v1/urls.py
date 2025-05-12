@@ -21,7 +21,7 @@ urlpatterns = [
         name="rest_profiles"
     ),
     path(
-        "profiles/<int:id>",
+        "profiles/<str:public_id>",
         ProfileDetails.as_view(),
         name="rest_profile_details"
     ),

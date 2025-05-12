@@ -1,4 +1,6 @@
-from rest_framework.authentication import BasicAuthentication
+from django.conf import settings
+from django.http import Http404
+
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.generics import (
     ListAPIView,
@@ -14,7 +16,7 @@ from rest_framework.status import (
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 
-from ...models import Profile
+from ...models import User, Profile
 from .permissions import ProfilePermissions
 from .serializers import (
     UserPost, ProfilesList,
@@ -73,10 +75,28 @@ class ProfileDetails(RetrieveUpdateAPIView):
     Working with single profile object details
     """
 
-    queryset = Profile.objects.all()
-    lookup_url_kwarg = "id"
-    authentication_classes = (BasicAuthentication,)
     permission_classes = [ProfilePermissions]
+
+    def get_object(self) -> Profile:
+        public_id = self.kwargs.get(
+            User.Field.public_id
+        )
+        if public_id:
+            user_id = settings.FF3_CIPHER.decrypt(
+                public_id
+            )
+            try:
+                profile = User.objects.get(
+                    id=user_id
+                ).profile
+            except User.DoesNotExist:
+                raise Http404
+
+            # Check permissions before returning object
+            self.check_object_permissions(self.request, profile)
+            return profile
+
+        raise Http404
 
     def get_serializer_class(self) -> ModelSerializer:
         # defines serializer for selected scenario

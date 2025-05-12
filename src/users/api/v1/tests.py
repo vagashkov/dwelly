@@ -167,12 +167,12 @@ class CreateUsers(APITestCase):
         )
 
 
-class ViewProfiles(APITestCase):
+class ProfileTest(APITestCase):
     """Testing different cases for profiles info access"""
 
     def setUp(self) -> None:
         # create test account
-        self.account = User.objects.create_user(
+        self.user = User.objects.create_user(
             email=email,
             password=password
         )
@@ -193,7 +193,7 @@ class ViewProfiles(APITestCase):
 
     def test_get_profiles_list_no_admin(self) -> None:
         # checking profiles list access as regular user
-        self.client.force_login(self.account)
+        self.client.force_login(self.user)
         response = self.client.get(reverse("rest_profiles"))
 
         self.assertEqual(
@@ -223,12 +223,12 @@ class ViewProfiles(APITestCase):
         response = self.client.get(
             reverse(
                  "rest_profile_details",
-                 args=(self.account.profile.id,)
+                 args=(self.admin.public_id,)
             )
         )
         self.assertEqual(
             response.status_code,
-            HTTP_401_UNAUTHORIZED
+            HTTP_403_FORBIDDEN
         )
 
     def test_get_other_user_profile_details(self) -> None:
@@ -244,7 +244,7 @@ class ViewProfiles(APITestCase):
         response = self.client.get(
             reverse(
                 "rest_profile_details",
-                args=(self.account.profile.id,)
+                args=(self.user.public_id,)
             )
         )
 
@@ -256,11 +256,11 @@ class ViewProfiles(APITestCase):
     def test_get_own_profile_details(self) -> None:
         # checking own profile access
 
-        self.client.force_authenticate(self.account)
+        self.client.force_authenticate(self.user)
         response = self.client.get(
             reverse(
                 "rest_profile_details",
-                args=(self.account.profile.id,)
+                args=(self.user.public_id,)
             )
         )
 
@@ -288,7 +288,7 @@ class ViewProfiles(APITestCase):
         response = self.client.get(
             reverse(
                 "rest_profile_details",
-                args=(self.account.profile.id,)
+                args=(self.user.public_id,)
             )
         )
 
@@ -304,7 +304,7 @@ class ViewProfiles(APITestCase):
         response = self.client.get(
             reverse(
                 "rest_profile_details",
-                args=(100,)
+                args=("999999",)
             )
         )
         self.assertEqual(
@@ -315,12 +315,12 @@ class ViewProfiles(APITestCase):
     def test_update_own_profile_details(self) -> None:
         # checking own profile details update access
 
-        self.client.force_authenticate(self.account)
+        self.client.force_authenticate(self.user)
         # try to update profile details
         response = self.client.patch(
             reverse(
                 "rest_profile_details",
-                args=(self.account.profile.id,),
+                args=(self.user.public_id,),
                 ),
             data=good_profile
             )
@@ -334,7 +334,7 @@ class ViewProfiles(APITestCase):
         response = self.client.get(
             reverse(
                 "rest_profile_details",
-                args=(self.account.profile.id,),
+                args=(self.user.public_id,),
                 )
             )
 

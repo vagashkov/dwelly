@@ -155,6 +155,7 @@ class UsersList(ModelSerializer):
         model = User
         fields = [
             User.Field.email,
+            User.Field.public_id,
             User.Field.is_active,
             User.Field.last_login
         ]

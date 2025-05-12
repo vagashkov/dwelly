@@ -29,6 +29,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     class Field:
         # Base entity data
         id: str = "id"
+        public_id: str = "public_id"
         created_at: str = "created_at"
         updated_at: str = "updated_at"
 
