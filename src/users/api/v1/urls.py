@@ -1,6 +1,9 @@
 from django.urls import path, include
 
-from .views import Users, Profiles, ProfileDetails
+from .views import (
+    Users, Profiles,
+    DisplayProfile, UserProfile
+)
 
 urlpatterns = [
     # user authentication section
@@ -14,6 +17,12 @@ urlpatterns = [
         Users.as_view(),
         name="rest_register"
     ),
+    # user profile
+    path(
+        "profile",
+        UserProfile.as_view(),
+        name="rest_user_profile"
+    ),
     # profiles section (for admins only)
     path(
         "profiles",
@@ -22,7 +31,7 @@ urlpatterns = [
     ),
     path(
         "profiles/<str:public_id>",
-        ProfileDetails.as_view(),
+        DisplayProfile.as_view(),
         name="rest_profile_details"
     ),
 ]

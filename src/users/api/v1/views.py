@@ -72,10 +72,26 @@ class Profiles(ListAPIView):
 
 class ProfileDetails(RetrieveUpdateAPIView):
     """
-    Working with single profile object details
+    Base class for single profile display end editing
     """
 
     permission_classes = [ProfilePermissions]
+
+    def get_serializer_class(self) -> ModelSerializer:
+        # defines serializer for selected scenario
+        if self.request.method == "GET":
+            return ProfileGet
+        elif self.request.method in ["PATCH", "PUT"]:
+            return ProfilePatch
+        raise MethodNotAllowed(
+            self.request.method
+        )
+
+
+class DisplayProfile(ProfileDetails):
+    """
+    Working with single profile object details
+    """
 
     def get_object(self) -> Profile:
         public_id = self.kwargs.get(
@@ -98,12 +114,14 @@ class ProfileDetails(RetrieveUpdateAPIView):
 
         raise Http404
 
-    def get_serializer_class(self) -> ModelSerializer:
-        # defines serializer for selected scenario
-        if self.request.method == "GET":
-            return ProfileGet
-        elif self.request.method in ["PATCH", "PUT"]:
-            return ProfilePatch
-        raise MethodNotAllowed(
-            self.request.method
-        )
+
+class UserProfile(DisplayProfile):
+    """
+    "My profile" for users
+    """
+
+    def get_object(self) -> Profile:
+        if not self.request.user.is_authenticated:
+            raise Http404
+
+        return self.request.user.profile

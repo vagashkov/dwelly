@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
-    HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_422_UNPROCESSABLE_ENTITY
@@ -253,35 +252,6 @@ class ProfileTest(APITestCase):
             HTTP_403_FORBIDDEN
             )
 
-    def test_get_own_profile_details(self) -> None:
-        # checking own profile access
-
-        self.client.force_authenticate(self.user)
-        response = self.client.get(
-            reverse(
-                "rest_profile_details",
-                args=(self.user.public_id,)
-            )
-        )
-
-        self.assertEqual(
-            response.status_code,
-            HTTP_200_OK
-            )
-
-        # verifying response content
-        self.assertIn(
-                Profile.Field.user,
-                response.data
-            )
-        account = response.data.get(
-            Profile.Field.user
-            )
-        self.assertEqual(
-            account.get(User.Field.email),
-            email
-            )
-
     def test_get_profile_details_as_admin(self) -> None:
         # checking other user profile details  with admin credentials
         self.client.force_authenticate(self.admin)
@@ -312,6 +282,43 @@ class ProfileTest(APITestCase):
             HTTP_404_NOT_FOUND
         )
 
+    def test_get_own_profile_no_auth(self) -> None:
+        # checking profiles list access without authentication
+        response = self.client.get(reverse("rest_user_profile"))
+
+        self.assertEqual(
+            response.status_code,
+            HTTP_404_NOT_FOUND
+        )
+
+    def test_get_own_profile_details(self) -> None:
+        # checking own profile access
+
+        self.client.force_authenticate(self.user)
+        response = self.client.get(
+            reverse(
+                "rest_user_profile"
+            )
+        )
+
+        self.assertEqual(
+            response.status_code,
+            HTTP_200_OK
+        )
+
+        # verifying response content
+        self.assertIn(
+            Profile.Field.user,
+            response.data
+        )
+        account = response.data.get(
+            Profile.Field.user
+        )
+        self.assertEqual(
+            account.get(User.Field.email),
+            email
+        )
+
     def test_update_own_profile_details(self) -> None:
         # checking own profile details update access
 
@@ -319,24 +326,23 @@ class ProfileTest(APITestCase):
         # try to update profile details
         response = self.client.patch(
             reverse(
-                "rest_profile_details",
-                args=(self.user.public_id,),
-                ),
+                "rest_user_profile"
+            ),
             data=good_profile
-            )
+        )
         # check result
         self.assertEqual(
             response.status_code,
             HTTP_200_OK
-            )
+        )
 
         # reload profile data one more time
         response = self.client.get(
             reverse(
                 "rest_profile_details",
                 args=(self.user.public_id,),
-                )
             )
+        )
 
         # check if all the data was updated successfully
         for key in good_profile.keys():
