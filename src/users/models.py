@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser, PermissionsMixin
 )
@@ -13,7 +14,9 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 from core.models import BaseModel
+from core.utils.images import ImageProcessor
 
+from .constants import AVATAR_DIMENSIONS
 from .managers import UserManager
 
 APP_NAME = "users"
@@ -177,3 +180,19 @@ class Profile(BaseModel):
     def __str__(self) -> str:
         """ Object string representation """
         return "{}".format(self.full_name())
+
+    def save(self,
+             *args: list,
+             **kwargs: dict
+             ) -> None:
+        # Save original to database and obtain it's storage name
+        super().save(*args, **kwargs)
+
+        if self.photo:
+            # Perform necessary routines (resize)
+            resizer: ImageProcessor = ImageProcessor(
+                settings.MEDIA_ROOT.joinpath(
+                    self.photo.name
+                )
+            )
+            resizer.create_thumbnail(*AVATAR_DIMENSIONS)

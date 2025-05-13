@@ -1,3 +1,5 @@
+from os import mkdir
+from os.path import exists
 from shutil import rmtree
 
 from PIL import Image
@@ -44,12 +46,18 @@ class ProfileTest(TestCase):
             color=(155, 0, 0)
         )
 
+        if not exists(TEST_DIR):
+            mkdir(TEST_DIR)
+        image_path = TEST_DIR / "test_photo.jpg"
+        image.save(image_path)
+
         # finally check profile photo field
-        self.profile.photo = SimpleUploadedFile(
-            name="profile_photo.jpg",
-            content=image.tobytes(),
-            content_type="image/jpeg"
-        )
+        with open(image_path, "rb") as profile_photo:
+            self.profile.photo = SimpleUploadedFile(
+                name="profile_photo.jpg",
+                content=profile_photo.read(),
+                content_type="image/jpeg"
+                )
         self.profile.save()
 
         # login using created account credentials

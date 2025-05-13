@@ -137,3 +137,7 @@ STATIC_URL = "static/"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Image processing related parameters
+IMAGE_QUALITY = 95
+IMAGE_DPI = 254
