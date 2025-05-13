@@ -1,11 +1,16 @@
+from shutil import rmtree
+
 from PIL import Image
 
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from ..models import User, Profile
 from ..tests import email, password, good_profile
+
+TEST_DIR = settings.BASE_DIR / "test_data"
 
 
 class ProfileTest(TestCase):
@@ -21,6 +26,7 @@ class ProfileTest(TestCase):
         )
         return user
 
+    @override_settings(MEDIA_ROOT=TEST_DIR)
     def setUp(self) -> None:
         # create user and related profile objects
         self.profile: Profile = self.create_good_user().profile
@@ -48,6 +54,13 @@ class ProfileTest(TestCase):
 
         # login using created account credentials
         self.client.force_login(self.profile.user)
+
+    def tearDown(self) -> None:
+        # Cleaning temporary data
+        try:
+            rmtree(TEST_DIR)
+        except OSError:
+            pass
 
     def test_display_profile(self) -> None:
         """
