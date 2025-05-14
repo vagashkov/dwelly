@@ -6,4 +6,7 @@ ERROR_MSG_DUPLICATE_MAIL = _("Email already exists")
 ERROR_MSG_DIFFERENT_PASSWORDS = _("Password and it's confirmation don't match")
 ERROR_ALLAUTH_NOT_INSTALLED = _("allauth needs to be added to INSTALLED_APPS.")
 
-AVATAR_DIMENSIONS = (200, 200)
+AVATAR_DIMENSIONS = {
+    "small": (48, 48),
+    "medium": (200, 200)
+}

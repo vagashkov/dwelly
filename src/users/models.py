@@ -195,4 +195,5 @@ class Profile(BaseModel):
                     self.photo.name
                 )
             )
-            resizer.create_thumbnail(*AVATAR_DIMENSIONS)
+            for size in AVATAR_DIMENSIONS:
+                resizer.create_thumbnail(*AVATAR_DIMENSIONS.get(size))

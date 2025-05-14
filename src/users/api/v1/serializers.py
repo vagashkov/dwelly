@@ -1,16 +1,21 @@
+from os.path import splitext, exists
+
+from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from rest_framework.request import Request
 from rest_framework.serializers import (
     Serializer, ModelSerializer,
     CharField, EmailField,
-    ValidationError, as_serializer_error
+    ValidationError, as_serializer_error,
+    SerializerMethodField
 )
 
 from ...constants import (
     ERROR_MSG_DUPLICATE_MAIL,
     ERROR_MSG_DIFFERENT_PASSWORDS,
-    ERROR_ALLAUTH_NOT_INSTALLED
+    ERROR_ALLAUTH_NOT_INSTALLED,
+    AVATAR_DIMENSIONS
 )
 
 from ...models import User, Profile
@@ -168,6 +173,26 @@ class ProfilesList(ModelSerializer):
 
     user = UsersList(required=True)
 
+    photo: SerializerMethodField = SerializerMethodField("get_photo")
+
+    def get_photo(self, obj: Profile) -> dict:
+        sizes = dict()
+        file_name, file_extension = splitext(str(obj.photo))
+        if file_name:
+            for size in AVATAR_DIMENSIONS:
+                dimensions = "{}x{}".format(*AVATAR_DIMENSIONS.get(size))
+                full_path = settings.MEDIA_ROOT.joinpath(
+                    "{}_{}{}".format(file_name, dimensions, file_extension)
+                )
+                if exists(full_path):
+                    sizes[size] = "{}{}_{}{}".format(
+                        settings.MEDIA_URL,
+                        file_name,
+                        dimensions,
+                        file_extension
+                    )
+        return sizes
+
     class Meta:
         """
         """
@@ -179,12 +204,10 @@ class ProfilesList(ModelSerializer):
         ]
 
 
-class ProfileGet(ModelSerializer):
+class ProfileGet(ProfilesList):
     """
     Serializer for getting single profile object details
     """
-
-    user = UserGet(required=True)
 
     class Meta:
         """

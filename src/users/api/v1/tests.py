@@ -11,12 +11,14 @@ from rest_framework.status import (
 )
 from rest_framework.test import APITestCase
 
+from tests.test_data import good_user, good_profile
+
 from ...constants import (
     ERROR_MSG_DUPLICATE_MAIL,
     ERROR_MSG_DIFFERENT_PASSWORDS
 )
 from ...models import User, Profile
-from ...tests import good_user, good_profile
+
 
 email = good_user.get(User.Field.email)
 password = good_user.get(User.Field.password)
