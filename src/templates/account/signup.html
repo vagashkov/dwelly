@@ -1,0 +1,22 @@
+<!-- templates/account/signup.html -->
+{% extends "_base.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% block title %}{% trans "Sign Up" %}{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-4">
+            <div class="mt-5">
+                <p class="h2">Signup</p>
+                <form method="post" class="mt-3">
+                    {% csrf_token %}
+                    {{ form | crispy }}
+                    <button class="btn btn-success btn-block" type="submit">Signup</button>
+                    <p class="small mt-4 text-body-secondary">* By pressing "Signup" button I agree with terms and conditions</p>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

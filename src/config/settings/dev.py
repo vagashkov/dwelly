@@ -23,3 +23,13 @@ FF3_KEY = "C4A5CEFE80FA957333EA7947AC284467"
 FF3_TWEAK = "01D250AAD1B8B6"
 FF3_LENGTH = 6
 FF3_CIPHER = FF3Cipher(FF3_KEY, FF3_TWEAK)
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = "static/"
+STATICFILES_DIRS = [
+    BASE_DIR / "static"  # noqa: F405
+]
+
+# Media files storage configuration
+MEDIA_ROOT = BASE_DIR.parent.joinpath("media")  # noqa: F405
+MEDIA_URL = "/media/"

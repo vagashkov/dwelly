@@ -1,0 +1,62 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <!-- Logo -->
+        <a href="{% url 'home' %}" class="navbar-brand">
+            <img src="{% static 'images/logo.png' %}" height=32px>
+        </a>
+
+        <!-- Navigator toggle button  -->
+        <button type="button"
+                class="navbar-toggler"
+                data-bs-toggle="collapse"
+                data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigator  -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto mt-1">
+                <!-- Top level content  -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link">News</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Gallery</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Rooms</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'home' %}" class="nav-link">Contacts</a>
+                </li>
+
+                <!-- User menu  -->
+                <li class="nav-item dropdown">
+                    <a
+                            class="nav-link dropdown-toggle"
+                            href="#" id="navbarDropdown"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false">User</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'user_display_profile' %}" class="dropdown-item">Profile</a>
+                            <a href="{% url 'account_logout' %}" class="dropdown-item">Log Out</a>
+                        {% else %}
+                            <a href="{% url 'account_login' %}" class="dropdown-item">Log In</a>
+                            <a href="{% url 'account_signup' %}" class="dropdown-item">Sign Up</a>
+                        {% endif %}
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
