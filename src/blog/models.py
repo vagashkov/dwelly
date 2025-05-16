@@ -148,7 +148,7 @@ class Post(Postable):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
-        return reverse("post_details", args=[self.slug])
+        return reverse("blog:post_details", args=[self.slug])
 
 
 class Comment(Postable):

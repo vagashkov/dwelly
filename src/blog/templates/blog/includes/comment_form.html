@@ -1,0 +1,12 @@
+<section id="comment-form" class="form-outline w-100">
+    <form action="{% url 'blog:post_details' post.slug %}" method="POST">
+        {% csrf_token %}
+        {% for field in comment_form %}
+            <div class="form-group {% if field.errors%}invalid{% endif %}">
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        {% endfor %}
+        <button class="btn btn-secondary btn-sm mt-2">Submit </button>
+    </form>
+</section>

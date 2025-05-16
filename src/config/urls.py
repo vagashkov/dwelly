@@ -16,7 +16,10 @@ urlpatterns = [
     # blog application urls
     path(
         "blog/",
-        include("blog.urls")
+        include(
+            "blog.urls",
+            namespace="blog"
+        ),
     ),
 
 
