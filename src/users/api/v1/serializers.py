@@ -1,5 +1,6 @@
 from os.path import splitext, exists
 
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 
@@ -18,7 +19,8 @@ from ...constants import (
     AVATAR_DIMENSIONS
 )
 
-from ...models import User, Profile
+from ...models import Profile
+User = get_user_model()
 
 try:
     from allauth.account.adapter import get_adapter

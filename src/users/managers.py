@@ -1,6 +1,8 @@
+from django.contrib.auth import get_user_model
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from .models import User
+    User = get_user_model()
 
 from django.contrib.auth.base_user import BaseUserManager
 

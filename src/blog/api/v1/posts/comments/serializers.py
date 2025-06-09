@@ -1,10 +1,12 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework.serializers import (
     ModelSerializer, SerializerMethodField
 )
 
-from users.models import User
-
 from .....models import Postable, Comment
+
+User = get_user_model()
 
 
 class GetComments(ModelSerializer):

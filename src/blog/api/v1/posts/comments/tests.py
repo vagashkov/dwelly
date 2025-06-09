@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
 
 from rest_framework.status import (
@@ -11,9 +12,9 @@ from rest_framework.test import APITestCase
 
 from .....models import Status, Postable, Post, Comment
 
-from users.models import User
 from tests.test_data import good_user
 
+User = get_user_model()
 email = good_user.get(User.Field.email)
 password = good_user.get(User.Field.password)
 

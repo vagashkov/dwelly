@@ -1,11 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.urls import reverse
 
 from tests.test_data import good_user, create_good_user
 
-from .models import User
-
+User = get_user_model()
 email = good_user.get(User.Field.email)
 password = good_user.get(User.Field.password)
 
@@ -54,6 +54,8 @@ class UserTest(TestCase):
         :return:
         """
         user = create_good_user()
+        self.assertEqual(user.email, email)
+        self.assertTrue(user.check_password(password))
         self.assertTrue(user.is_active)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)

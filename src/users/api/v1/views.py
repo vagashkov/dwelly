@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.http import Http404
 
@@ -16,12 +17,13 @@ from rest_framework.status import (
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 
-from ...models import User, Profile
+from ...models import Profile
 from .permissions import ProfilePermissions
 from .serializers import (
     UserPost, ProfilesList,
     ProfileGet, ProfilePatch
 )
+User = get_user_model()
 
 
 class Users(CreateAPIView):
