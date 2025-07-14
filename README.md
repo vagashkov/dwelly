@@ -1,2 +1,2 @@
-# pet-hotel
-Pawsitive Stay Manager - pet hotel management software
+# dwelly
+Simple yet functional and friendly property management system for family hotel or apartment owners
