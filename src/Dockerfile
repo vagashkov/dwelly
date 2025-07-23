@@ -3,7 +3,7 @@ FROM python:3.13-slim-bookworm
 
 LABEL title="Django img"
 LABEL version="1.0"
-LABEL description="Debian-based image with Python/Django support for PetHotel project"
+LABEL description="Debian-based image with Python/Django support for dwelly project"
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -27,3 +27,5 @@ RUN apt update && apt -y upgrade && \
       django
 
 USER django
+
+ENTRYPOINT ["./entrypoint.sh"]

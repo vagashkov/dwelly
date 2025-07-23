@@ -10,13 +10,16 @@ SECRET_KEY = "django-insecure-hz^x4#xvj7p@6p2h64ssh9*uccr-7ecjcmi2944!pf!sk6&e%@
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "pethotel-dev",
-        "USER": "pethotel",
-        "PASSWORD": "pethotel",
+        "NAME": "dwelly",
+        "USER": "dwelly",
+        "PASSWORD": "dwelly",
         "HOST": "localhost",
         "PORT": 5432
     }
 }
+
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 
 # FF3 encrypter settings (read https://pypi.org/project/ff3/ for details)
 FF3_KEY = "C4A5CEFE80FA957333EA7947AC284467"
