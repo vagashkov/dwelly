@@ -1,6 +1,10 @@
+from io import BytesIO
+from logging import ERROR as log_error
+from PIL import Image, ImageEnhance
 from typing import Any
-
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.files.storage import default_storage
 from django.db.models import (
     ForeignKey, PROTECT, CASCADE, ManyToManyField,
     BooleanField, CharField, TextField, SlugField,
@@ -145,10 +149,94 @@ class Post(Postable):
         if not self.slug:
             self.slug = slugify(self.title)
 
+        # Save original to database and obtain it's storage name
         super().save(*args, **kwargs)
+
+        if self.cover:
+            try:
+                with Image.open(self.cover) as image:
+                    image_ratio = image.size[0] / image.size[1]
+                    img_format = image.format
+                    dot = self.cover.name.rfind(".")
+                    file_name = self.cover.name[:dot]
+                    file_extension = self.cover.name[dot + 1:]
+
+                    for size in settings.IMAGE_SIZES:
+                        memfile = BytesIO()
+
+                        width, height = size[0], size[1]
+                        resize_ratio = width / height
+
+                        if image_ratio > resize_ratio:
+                            # Need to crop left and right edges
+                            resize_factor = height / image.size[1]
+                            cropped_width = width / resize_factor
+                            edge = int((image.size[0] - cropped_width) / 2)
+                            cropped_image = image.crop(
+                                (edge, 0, image.size[0] - edge, image.size[1])
+                            )
+                        else:
+                            # Need to crop from top and bottom
+                            resize_factor = width / image.size[0]
+                            cropped_height = height / resize_factor
+                            edge = int((image.size[1] - cropped_height) / 2)
+                            cropped_image = image.crop(
+                                (0, edge, image.size[0], image.size[1] - edge)
+                            )
+
+                        # Create thumbnail for requested width and height
+                        thumbnail_image = cropped_image.resize(
+                            (width, height),
+                            Image.Resampling.LANCZOS
+                        )
+                        # Sharpen it
+                        enhancer = ImageEnhance.Sharpness(thumbnail_image)
+                        thumbnail_image = enhancer.enhance(2)
+                        thumbnail_image.save(
+                            memfile,
+                            format=img_format,
+                            quality=settings.IMAGE_QUALITY,
+                            dpi=(settings.IMAGE_DPI, settings.IMAGE_DPI),
+                            progressive=True
+                        )
+                        # Save it into images folder
+                        outfile = "{}_{}x{}.{}".format(
+                            file_name,
+                            str(width),
+                            str(height),
+                            file_extension
+                        )
+                        default_storage.save(outfile, memfile)
+                        memfile.close()
+            except IOError as error:
+                log_error(error)
 
     def get_absolute_url(self) -> str:
         return reverse("blog:post_details", args=[self.slug])
+
+    def cover_preview(self):
+        dot = self.cover.url.rfind(".")
+        file_name = self.cover.url[:dot]
+        file_extension = self.cover.url[dot + 1:]
+
+        return "{}_{}x{}.{}".format(
+                        file_name,
+                        str(settings.IMAGE_SIZE_SMALL[0]),
+                        str(settings.IMAGE_SIZE_SMALL[1]),
+                        file_extension
+                    )
+
+    def cover_details(self):
+        dot = self.cover.url.rfind(".")
+        file_name = self.cover.url[:dot]
+        file_extension = self.cover.url[dot + 1:]
+
+        return "{}_{}x{}.{}".format(
+                        file_name,
+                        str(settings.IMAGE_SIZE_MEDIUM[0]),
+                        str(settings.IMAGE_SIZE_MEDIUM[1]),
+                        file_extension
+                    )
 
 
 class Comment(Postable):
