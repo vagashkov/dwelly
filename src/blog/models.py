@@ -11,7 +11,7 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from core.models import BaseModel, Reference
-from core.utils.images import ImageProcessor
+from core.utils.images import create_thumbnails
 
 APP_NAME = "blog"
 
@@ -150,10 +150,11 @@ class Post(Postable):
         super().save(*args, **kwargs)
 
         if self.cover:
-            img_processor: ImageProcessor = ImageProcessor(self.cover.path)
             for size in settings.IMAGE_SIZES:
-                img_processor.create_thumbnail(
-                    size[0], size[1]
+                create_thumbnails.delay(
+                    self.cover.path,
+                    size[0],
+                    size[1]
                 )
 
     def get_absolute_url(self) -> str:

@@ -14,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 from core.models import BaseModel
-from core.utils.images import ImageProcessor
+from core.utils.images import create_thumbnails
 
 from .constants import AVATAR_DIMENSIONS
 from .managers import UserManager
@@ -190,10 +190,10 @@ class Profile(BaseModel):
 
         if self.photo:
             # Perform necessary routines (resize)
-            resizer: ImageProcessor = ImageProcessor(
-                settings.MEDIA_ROOT.joinpath(
-                    self.photo.name
-                )
-            )
             for size in AVATAR_DIMENSIONS:
-                resizer.create_thumbnail(*AVATAR_DIMENSIONS.get(size))
+                create_thumbnails(
+                    settings.MEDIA_ROOT.joinpath(
+                        self.photo.name
+                    ),
+                    *AVATAR_DIMENSIONS.get(size)
+                )
