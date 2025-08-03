@@ -34,5 +34,5 @@ STATICFILES_DIRS = [
 ]
 
 # Media files storage configuration
-MEDIA_ROOT = BASE_DIR.parent.joinpath("media")  # noqa: F405
+MEDIA_ROOT = BASE_DIR.joinpath("media")  # noqa: F405
 MEDIA_URL = "/media/"

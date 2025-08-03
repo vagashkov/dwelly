@@ -16,11 +16,13 @@ django-crispy-forms==2.4
 django-phonenumber-field==8.1.0
 djangorestframework==3.16.0
 drf-spectacular==0.28.0
+environs==14.2.0
 ff3==1.0.2
 inflection==0.5.1
 jsonschema==4.24.0
 jsonschema-specifications==2025.4.1
 kombu==5.5.4
+marshmallow==4.0.0
 packaging==25.0
 phonenumbers==9.0.8
 pillow==11.3.0
@@ -32,6 +34,7 @@ pydantic==2.11.7
 pydantic_core==2.33.2
 pyngo==2.4.0
 python-dateutil==2.9.0.post0
+python-dotenv==1.1.1
 PyYAML==6.0.2
 redis==6.2.0
 referencing==0.36.2

@@ -18,7 +18,10 @@ services:
 
   celery:
     container_name: celery
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.docker-dev
     build: .
+    command: celery -A config worker -l INFO
     volumes:
       - .:/src
     depends_on:
