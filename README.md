@@ -21,11 +21,20 @@ Simple yet functional and friendly property management system for family hotel o
   - launch Celery: celery -A config worker
   - launch Django: python manage.py runserver --settings=config.settings.local-dev
 
+### Testing
+- launch redis and celery as described before
+- launch tests: python manage.py test --settings=config.settings.local-test
+
 
 ## Docker deployment
+
+### Installation and launch:
 - ensure that your Docker Desktop is up and running;
 - navigate to src directory;
 - create images and start containers: docker-compose -f docker-compose-dev.yml up -d --build;
 - open src-web container terminal;
 - perform migration and create superuser;
 - proceed to standard Django landing page (https://127.0.0.1:8000)
+
+### Testing:
+- use docker-compose -f docker-compose-test.yml up -d --build to perform Docker-based testing

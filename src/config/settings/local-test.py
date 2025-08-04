@@ -18,8 +18,9 @@ DATABASES = {
     }
 }
 
-CELERY_BROKER_URL = "redis://redis:6379/0"
-CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+CELERY_ALWAYS_EAGER = True
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 
 # FF3 encrypter settings (read https://pypi.org/project/ff3/ for details)
 FF3_KEY = "C4A5CEFE80FA957333EA7947AC284467"
