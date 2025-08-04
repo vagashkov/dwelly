@@ -1,7 +1,6 @@
 """
 Django settings for PetHotel project.
 """
-
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,6 +30,7 @@ THIRD_PARTY_APPS = [
 ]
 PROJECT_APPS = [
     "users.apps.UsersConfig",
+    "blog.apps.BlogConfig",
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
@@ -141,3 +141,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Image processing related parameters
 IMAGE_QUALITY = 95
 IMAGE_DPI = 254
+IMAGE_SIZE_SMALL = (408, 272)
+IMAGE_SIZE_MEDIUM = (916, 544)
+IMAGE_SIZES = {
+    IMAGE_SIZE_SMALL,
+    IMAGE_SIZE_MEDIUM
+}

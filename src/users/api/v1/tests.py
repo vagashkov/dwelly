@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from rest_framework.exceptions import ErrorDetail
@@ -17,8 +18,8 @@ from ...constants import (
     ERROR_MSG_DUPLICATE_MAIL,
     ERROR_MSG_DIFFERENT_PASSWORDS
 )
-from ...models import User, Profile
-
+from ...models import Profile
+User = get_user_model()
 
 email = good_user.get(User.Field.email)
 password = good_user.get(User.Field.password)

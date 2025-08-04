@@ -1,7 +1,10 @@
 from django.contrib.admin import site, StackedInline
+from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User, Profile
+from .models import Profile
+
+User = get_user_model()
 
 
 class ProfileInline(StackedInline):

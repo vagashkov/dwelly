@@ -1,0 +1,30 @@
+{% extends "_base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block css_files %}
+{% endblock %}
+{% block title %}{{ post.title }}{% endblock title %}
+{% block content %}
+    <!-- posts detail -->
+    <main class="container">
+        <h2>{{ post.title }}</h2>
+        <p class="small text-muted">Last updated on <time>{{ post.updated_at|date:"M d, Y" }}</time> by {{ post.author }}</p>
+        <div class="mb-2">
+            {% for tag in post.tags.all %}
+            <span><small>{{ tag.name }}</small></span>
+            {% endfor %}
+        </div>
+        {% if post.cover %}
+            <img src="{{ post.cover_details }}" alt="{{ post.title }}" class="img-fluid">
+        {% endif %}
+        <div class="mt-2">
+            {{ post.text|linebreaks }}
+        </div>
+    </main>
+    <!-- Enter comment form (for registered users only) -->
+    {% if user.is_authenticated %}
+        {% include "blog/includes/comment_form.html" %}
+    {% endif %}
+    <!-- Previous comments list -->
+    {% include "blog/includes/comments_list.html" %}
+{% endblock content %}

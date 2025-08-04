@@ -13,6 +13,16 @@ from core.views import HomeView
 urlpatterns = [
     path("admin/", admin.site.urls),
 
+    # blog application urls
+    path(
+        "blog/",
+        include(
+            "blog.urls",
+            namespace="blog"
+        ),
+    ),
+
+
     # user accounts and profiles management
     path(
         "users/",

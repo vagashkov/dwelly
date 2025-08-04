@@ -1,0 +1,51 @@
+' users app use cases diagram
+@startuml name "Users app usecases"
+title users app usecases
+skinparam actorStyle awesome
+
+left to right direction
+
+package "Users" {
+actor "Unregistered user" as UU
+actor "Registered user" as RU
+}
+
+package "Management" {
+actor "Staff" as ST
+actor "Admin" as AD
+}
+
+RU <|-left- ST
+ST <|-right- AD
+
+rectangle "users app" {
+(Login)
+(Signup)
+(Logout)
+
+(Change Password)
+(Reset Password)
+
+(Open profile)
+(Edit profile)
+
+(Create User)
+(Edit User)
+(Reset User Password)
+(Delete User)
+}
+
+:UU: --> (Login)
+:UU: --> (Signup)
+:UU: --> (Reset Password)
+
+:RU: --> (Change Password)
+:RU: --> (Open profile)
+:RU: --> (Edit profile)
+:RU: --> (Logout)
+
+:AD: --> (Create User)
+:AD: --> (Edit User)
+:AD: --> (Reset User Password)
+:AD: --> (Delete User)
+@enduml
