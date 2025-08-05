@@ -8,10 +8,58 @@ from celery import shared_task
 
 
 @shared_task
+def convert_image(
+        image_path: str,
+        image_format: str
+) -> None:
+    """
+    Performs image convertion to predefined format
+    """
+
+    if not image_path:
+        raise ValueError("No image path provided")
+
+    if not image_format:
+        raise ValueError("No image format provided")
+
+    try:
+        file_name, _ = os.path.splitext(image_path)
+        with Image.open(image_path) as image:
+            # Apply filters
+            enhancer = ImageEnhance.Sharpness(image)
+            processed_image = enhancer.enhance(2)
+
+            # Define result file name
+            outfile = settings.MEDIA_ROOT.joinpath(
+                "{}.{}".format(
+                    file_name,
+                    image_format
+                )
+            )
+
+            # And save result
+            processed_image.save(
+                outfile,
+                format=image_format,
+                quality=settings.IMAGE_QUALITY,
+                dpi=(settings.IMAGE_DPI, settings.IMAGE_DPI),
+                progressive=True
+            )
+    except OSError as error:
+        logging.error(
+            "Cannot convert photo {}: {}".format(
+                image_path,
+                error
+            )
+        )
+
+
+@shared_task
 def create_thumbnails(
         image_path: str,
         width: int,
-        height: int
+        height: int,
+        img_format: str
 ) -> None:
     """
     Performs image resize to predefined width and height
@@ -21,7 +69,7 @@ def create_thumbnails(
         file_name, file_extension = os.path.splitext(image_path)
         with Image.open(image_path) as image:
             # Obtain image original format and dimensions
-            img_format = image.format
+            image_format = img_format if img_format else image.format
             image_ratio = image.size[0] / image.size[1]
             resize_ratio = width / height
 
@@ -50,11 +98,11 @@ def create_thumbnails(
             )
             # Save it into images folder
             outfile = settings.MEDIA_ROOT.joinpath(
-                "{}_{}x{}{}".format(
+                "{}_{}x{}.{}".format(
                     file_name,
                     str(width),
                     str(height),
-                    file_extension
+                    image_format
                 )
             )
             # Apply filters
@@ -64,7 +112,7 @@ def create_thumbnails(
             # And save result
             thumbnail_image.save(
                 outfile,
-                format=img_format,
+                format=image_format,
                 quality=settings.IMAGE_QUALITY,
                 dpi=(settings.IMAGE_DPI, settings.IMAGE_DPI),
                 progressive=True

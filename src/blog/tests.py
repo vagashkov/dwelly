@@ -111,9 +111,10 @@ class PostTests(BaseTest):
         self.assertContains(response, "Some test post content")
         self.assertContains(
             response,
-            "post_cover_{}x{}.jpg".format(
+            "post_cover_{}x{}.{}".format(
                 settings.IMAGE_SIZE_MEDIUM[0],
-                settings.IMAGE_SIZE_MEDIUM[1]
+                settings.IMAGE_SIZE_MEDIUM[1],
+                settings.IMAGE_FORMAT
                 )
         )
         # Checking comments section

@@ -139,6 +139,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Image processing related parameters
+IMAGE_FORMAT = "webp"
 IMAGE_QUALITY = 95
 IMAGE_DPI = 254
 IMAGE_SIZE_SMALL = (408, 272)
@@ -147,3 +148,5 @@ IMAGE_SIZES = {
     IMAGE_SIZE_SMALL,
     IMAGE_SIZE_MEDIUM
 }
+IMAGE_CONVERT_ORIGINAL = True
+IMAGE_KEEP_ORIGINAL = False
