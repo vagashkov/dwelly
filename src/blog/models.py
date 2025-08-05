@@ -76,6 +76,10 @@ class Postable(BaseModel):
     )
 
 
+def get_default_status():
+    return Status.objects.get(is_initial=True)
+
+
 class Post(Postable):
     """
     Blog post class
@@ -127,6 +131,7 @@ class Post(Postable):
         Status,
         null=False,
         blank=False,
+        default=get_default_status,
         related_name="posts",
         on_delete=PROTECT,
         verbose_name=_("Status")
