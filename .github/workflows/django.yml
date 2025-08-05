@@ -38,4 +38,4 @@ jobs:
         pip install -r src/requirements.txt
     - name: Run Tests
       run: |
-        python src/manage.py test
+        python src/manage.py test --settings=config.settings.local-test
