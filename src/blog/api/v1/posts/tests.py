@@ -89,7 +89,7 @@ class Posts(BaseTest):
             title="First",
             author=self.admin_user,
             excerpt="First post excerpt",
-            text="First post excerpt",
+            text="First post text",
             status=self.initial_status
         )
         self.first_post.tags.add(
@@ -104,8 +104,8 @@ class Posts(BaseTest):
         self.second_post = Post.objects.create(
             title="Second",
             author=self.admin_user,
-            excerpt="First post excerpt",
-            text="First post excerpt",
+            excerpt="Second post excerpt",
+            text="Second post excerpt",
             status=self.initial_status
         )
         self.second_post.tags.add(self.first_tag)
@@ -137,6 +137,34 @@ class Posts(BaseTest):
                 field,
                 response.data[0]
                 )
+
+    def test_search_posts(self) -> None:
+        response = self.client.get(
+            reverse(
+                "blog:api_search",
+                query={
+                    "q": "First post"
+                }
+            ),
+        )
+
+        # Check results through response code
+        self.assertEqual(
+            response.status_code,
+            HTTP_200_OK
+        )
+
+        # Check received data
+        # - data length
+        self.assertEqual(
+            len(response.data),
+            1
+        )
+        # - data content
+        self.assertEqual(
+            "First post excerpt",
+            response.data[0].get("excerpt")
+        )
 
     def test_post_details(self) -> None:
         response = self.client.get(

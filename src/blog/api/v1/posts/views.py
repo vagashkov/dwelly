@@ -1,8 +1,9 @@
 import PIL
 from PIL import Image
 from pydantic import ValidationError
+from django.db.models import Q
 from rest_framework.generics import (
-    ListCreateAPIView, RetrieveUpdateDestroyAPIView
+    ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 )
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -16,6 +17,8 @@ from rest_framework.status import (
     HTTP_422_UNPROCESSABLE_ENTITY,
 )
 from rest_framework.views import APIView
+
+from core.models import BaseModel
 
 from ....constants import (
     ERROR_KEY,
@@ -105,6 +108,29 @@ class Posts(ListCreateAPIView):
             post_data,
             status=HTTP_201_CREATED,
             headers=headers
+        )
+
+
+class Search(ListAPIView):
+    """
+    Manages post search routine
+    """
+    serializer_class = GetListSerializer
+    permission_classes = [PostPermissions]
+
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+
+        return Post.objects.filter(
+            Q(title__icontains=query)
+            |
+            Q(excerpt=query)
+            |
+            Q(text__icontains=query)
+        ).order_by(
+            "-{}".format(
+                BaseModel.Field.created_at
+            )
         )
 
 
