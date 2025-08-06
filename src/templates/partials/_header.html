@@ -22,19 +22,19 @@
             <ul class="navbar-nav me-auto mt-1">
                 <!-- Top level content  -->
                 <li class="nav-item">
-                    <a href="{% url 'blog:posts' %}" class="nav-link">Blog</a>
+                    <a href="{% url 'blog:posts' %}" class="nav-link" hx-boost="true">Blog</a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">Gallery</a>
+                    <a href="#" class="nav-link" hx-boost="true">Gallery</a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">Rooms</a>
+                    <a href="#" class="nav-link" hx-boost="true">Rooms</a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{% url 'home' %}" class="nav-link">Contacts</a>
+                    <a href="{% url 'home' %}" class="nav-link" hx-boost="true">Contacts</a>
                 </li>
 
                 <!-- User menu  -->
@@ -48,11 +48,11 @@
                             aria-expanded="false">User</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         {% if user.is_authenticated %}
-                            <a href="{% url 'user_display_profile' %}" class="dropdown-item">Profile</a>
-                            <a href="{% url 'account_logout' %}" class="dropdown-item">Log Out</a>
+                            <a href="{% url 'user_display_profile' %}" class="dropdown-item" hx-boost="true">Profile</a>
+                            <a href="{% url 'account_logout' %}" class="dropdown-item" hx-boost="true">Log Out</a>
                         {% else %}
-                            <a href="{% url 'account_login' %}" class="dropdown-item">Log In</a>
-                            <a href="{% url 'account_signup' %}" class="dropdown-item">Sign Up</a>
+                            <a href="{% url 'account_login' %}" class="dropdown-item" hx-boost="true">Log In</a>
+                            <a href="{% url 'account_signup' %}" class="dropdown-item" hx-boost="true">Sign Up</a>
                         {% endif %}
                     </div>
                 </li>
