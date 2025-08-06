@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import (
     HttpRequest, HttpResponse,
     Http404, HttpResponseRedirect
@@ -22,6 +23,30 @@ class Posts(ListView):
     ordering = "-{}".format(BaseModel.Field.created_at)
     template_name = "blog/posts.html"
     context_object_name = "posts"
+
+
+class Search(ListView):
+    """
+    Posts search routine
+    """
+
+    template_name = "blog/posts.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+
+        return Post.objects.filter(
+            Q(title__icontains=query)
+            |
+            Q(excerpt=query)
+            |
+            Q(text__icontains=query)
+        ).order_by(
+            "-{}".format(
+                BaseModel.Field.created_at
+            )
+        )
 
 
 class PostDetails(View):

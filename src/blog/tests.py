@@ -95,6 +95,20 @@ class PostTests(BaseTest):
         self.assertContains(response, "Test excerpt")
         self.assertTemplateUsed(response, "blog/posts.html")
 
+    def test_search_posts(self) -> None:
+        response = self.client.get(
+            reverse(
+                "blog:search",
+                query={
+                    "q": "Test post"
+                }
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Test post")
+        self.assertContains(response, "Test excerpt")
+        self.assertTemplateUsed(response, "blog/posts.html")
+
     def test_unknown_post_details(self) -> None:
         no_response = self.client.get("/blog/no-post")
         self.assertEqual(no_response.status_code, 404)
