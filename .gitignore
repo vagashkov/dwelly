@@ -168,3 +168,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Redis dump file
+dump.rdb
+
+# media files storage
+media/
