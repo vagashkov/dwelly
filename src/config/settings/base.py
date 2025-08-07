@@ -31,6 +31,7 @@ THIRD_PARTY_APPS = [
 PROJECT_APPS = [
     "users.apps.UsersConfig",
     "blog.apps.BlogConfig",
+    "listings.apps.ListingsConfig"
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
