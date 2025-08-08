@@ -97,7 +97,8 @@ class ObjectTypes(BaseAPITest):
         # Check results for correct data
         self.assertEqual(
             len(response.data),
-            5
+            # One more object type was created on listing creation
+            5+1
         )
         for cat_index in range(0, 5):
             self.assertContains(

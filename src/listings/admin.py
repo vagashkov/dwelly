@@ -6,7 +6,7 @@ from core.models import Reference
 
 from .models import (
     ObjectType, Category, Amenity,
-    HouseRule,
+    HouseRule, Listing
 )
 
 APP_NAME = "listings"
@@ -61,7 +61,31 @@ class AmenityAdmin(ModelAdmin):
     )
 
 
+class ListingAdmin(ModelAdmin):
+    """
+    Simple class for editing listings using admin panel
+    """
+
+    prepopulated_fields = {
+        Listing.Field.slug: (
+            Listing.Field.title,
+        )
+    }
+
+    list_display = (
+        Listing.Field.title,
+        Listing.Field.object_type,
+    )
+
+    list_filter = (
+        "{}__name".format(
+            Listing.Field.object_type
+        ),
+    )
+
+
 site.register(ObjectType, ObjectTypeAdmin)
 site.register(Category, CategoryAdmin)
 site.register(Amenity, AmenityAdmin)
 site.register(HouseRule, HouseRuleAdmin)
+site.register(Listing, ListingAdmin)

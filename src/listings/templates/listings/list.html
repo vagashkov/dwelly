@@ -1,0 +1,24 @@
+{% extends "_base.html" %}
+{% load static %}
+{% block css_files %}{% endblock %}
+{% block title %}Rooms{% endblock title %}
+{% block content %}
+    <!-- Page header with logo and tagline-->
+    <header class="bg-light py-5 mb-4">
+        <div class="container">
+            <div class="text-center my-5">
+                <h1 class="fw-bolder">Welcome to Dwelly Rooms!</h1>
+                <p class="lead mb-0">Please enjoy our rooms and amenities</p>
+            </div>
+        </div>
+    </header>
+    <!-- all posts -->
+    <main class="container bg-light text-dark">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 d-flex d-flex justify-content-between">
+            {% for listing in listings %}
+                {% include "listings/includes/listing_preview.html" %}
+            {% endfor %}
+        </div>
+    </main>
+    <!-- all posts -->
+{% endblock content %}
