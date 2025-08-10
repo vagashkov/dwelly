@@ -10,6 +10,7 @@ from django.views.generic import View
 
 from core.models import BaseModel
 
+from .constants import POSTS_ORDERING
 from .forms import CommentForm
 from .models import Post
 
@@ -20,10 +21,13 @@ class Posts(ListView):
     """
 
     model = Post
-    ordering = "-{}".format(BaseModel.Field.created_at)
+    ordering = POSTS_ORDERING
     template_name = "blog/posts.html"
     context_object_name = "posts"
     paginate_by = 10
+
+    def get_queryset(self):
+        return Post.objects.get_active_posts()
 
 
 class Search(ListView):

@@ -13,6 +13,8 @@ from django.utils.translation import gettext_lazy as _
 from core.models import BaseModel, Reference
 from core.utils.images import convert_image, create_thumbnails
 
+from .managers import PostManager
+
 APP_NAME = "blog"
 
 
@@ -136,6 +138,8 @@ class Post(Postable):
         on_delete=PROTECT,
         verbose_name=_("Status")
     )
+
+    objects = PostManager()
 
     def __str__(self) -> str:
         return "{}".format(self.title)

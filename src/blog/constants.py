@@ -1,5 +1,10 @@
 from django.utils.translation import gettext_lazy as _
 
+from core.models import BaseModel
+
+ACTIVE_POST_STATUS = "Published"
+POSTS_ORDERING = "-{}".format(BaseModel.Field.created_at)
+
 ERROR_KEY = "errors"
 ERROR_MSG_NO_INITIAL_STATUS = _("Initial status not found")
 ERROR_MSG_NO_IMAGE_ATTACHED = _("Image is not attached")
