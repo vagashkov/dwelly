@@ -1,4 +1,3 @@
-from django.db.models import Q
 from django.http import (
     HttpRequest, HttpResponse,
     Http404, HttpResponseRedirect
@@ -7,8 +6,6 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic.list import ListView
 from django.views.generic import View
-
-from core.models import BaseModel
 
 from .constants import POSTS_ORDERING
 from .forms import CommentForm
@@ -41,17 +38,7 @@ class Search(ListView):
     def get_queryset(self):
         query = self.request.GET.get("q")
 
-        return Post.objects.filter(
-            Q(title__icontains=query)
-            |
-            Q(excerpt=query)
-            |
-            Q(text__icontains=query)
-        ).order_by(
-            "-{}".format(
-                BaseModel.Field.created_at
-            )
-        )
+        return Post.objects.search_posts(query)
 
 
 class PostDetails(View):
