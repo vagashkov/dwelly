@@ -23,6 +23,7 @@ class Posts(ListView):
     ordering = "-{}".format(BaseModel.Field.created_at)
     template_name = "blog/posts.html"
     context_object_name = "posts"
+    paginate_by = 10
 
 
 class Search(ListView):
