@@ -94,6 +94,8 @@ class Listing(BaseModel):
         check_in_time: str = "check_in_time"
         check_out_time: str = "check_out_time"
         instant_booking: str = "instant_booking"
+        # Other data
+        absolute_url: str = "absolute_url"
 
     LOOKUP_KEY = "slug"
 
