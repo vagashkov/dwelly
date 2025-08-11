@@ -108,7 +108,7 @@ class Tests(APITestCase):
         )
 
         self.assertEqual(
-            len(response.data),
+            len(response.data.get("results")),
             2
         )
 

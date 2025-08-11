@@ -17,6 +17,7 @@ class ObjectTypes(ListCreateAPIView):
 
     queryset = ObjectType.objects.all()
     serializer_class = ObjectTypeSerializer
+    pagination_class = None
     permission_classes = [ObjectTypePermissions]
 
 

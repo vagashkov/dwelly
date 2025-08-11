@@ -19,6 +19,7 @@ from rest_framework.test import override_settings
 
 from tests.test_data import good_user
 
+from ....constants import ACTIVE_POST_STATUS
 from ....models import Tag, Status, Postable, Post
 from ....tests import BaseTest
 
@@ -79,9 +80,13 @@ class Posts(BaseTest):
             password=password
         )
 
-        self.initial_status = Status.objects.create(
+        self.draft_status = Status.objects.create(
             name="Draft",
             is_initial=True
+        )
+
+        self.active_status = Status.objects.create(
+            name=ACTIVE_POST_STATUS
         )
 
         # Create first post
@@ -90,7 +95,7 @@ class Posts(BaseTest):
             author=self.admin_user,
             excerpt="First post excerpt",
             text="First post text",
-            status=self.initial_status
+            status=self.active_status
         )
         self.first_post.tags.add(
             self.first_tag,
@@ -106,7 +111,7 @@ class Posts(BaseTest):
             author=self.admin_user,
             excerpt="Second post excerpt",
             text="Second post excerpt",
-            status=self.initial_status
+            status=self.draft_status
         )
         self.second_post.tags.add(self.first_tag)
 
@@ -128,14 +133,14 @@ class Posts(BaseTest):
         # Check received data
         # - data length
         self.assertEqual(
-            len(response.data),
-            2
+            len(response.data.get("results")),
+            1
         )
         # - data content
         for field in fields:
             self.assertIn(
                 field,
-                response.data[0]
+                response.data.get("results")[0]
                 )
 
     def test_search_posts(self) -> None:
@@ -157,13 +162,13 @@ class Posts(BaseTest):
         # Check received data
         # - data length
         self.assertEqual(
-            len(response.data),
+            len(response.data.get("results")),
             1
         )
         # - data content
         self.assertEqual(
             "First post excerpt",
-            response.data[0].get("excerpt")
+            response.data.get("results")[0].get("excerpt")
         )
 
     def test_post_details(self) -> None:

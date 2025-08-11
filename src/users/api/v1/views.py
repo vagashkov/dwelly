@@ -17,7 +17,10 @@ from rest_framework.status import (
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 
+from ...constants import USERS_ORDERING
 from ...models import Profile
+
+from .paginators import UserPaginator
 from .permissions import ProfilePermissions
 from .serializers import (
     UserPost, ProfilesList,
@@ -30,7 +33,6 @@ class Users(CreateAPIView):
     """
     Manages user account registration routine
     """
-
     serializer_class = UserPost
     permission_classes = [AllowAny]
 
@@ -67,9 +69,14 @@ class Profiles(ListAPIView):
     Manages user profile list retrieval
     """
 
-    queryset = Profile.objects.all()
     serializer_class = ProfilesList
+    pagination_class = UserPaginator
     permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        return Profile.objects.all().order_by(
+            USERS_ORDERING
+        )
 
 
 class ProfileDetails(RetrieveUpdateAPIView):

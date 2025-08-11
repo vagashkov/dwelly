@@ -17,6 +17,7 @@ class Categories(ListCreateAPIView):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = None
     permission_classes = [CategoryPermissions]
 
 

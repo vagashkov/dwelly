@@ -1,7 +1,9 @@
 import PIL
 from PIL import Image
 from pydantic import ValidationError
-from django.db.models import Q
+
+from django.db.models import QuerySet
+
 from rest_framework.generics import (
     ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 )
@@ -18,17 +20,18 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 
-from core.models import BaseModel
-
 from ....constants import (
     ERROR_KEY,
     ERROR_MSG_NO_INITIAL_STATUS,
     ERROR_MSG_NO_IMAGE_ATTACHED,
     ERROR_MSG_UNSUPPORTED_IMAGE_FORMAT,
     ERROR_MSG_NO_POST,
-    ERROR_MSG_MULTIPLE_POSTS
+    ERROR_MSG_MULTIPLE_POSTS,
+    POSTS_ORDERING
 )
 from ....models import Post, Status
+
+from .paginators import PostsPaginator
 from .permissions import PostPermissions
 from .serializers import (
     GetListSerializer,
@@ -43,9 +46,13 @@ class Posts(ListCreateAPIView):
     Manages posts listing and new post creation
     """
 
-    queryset = Post.objects.all()
+    order_by = POSTS_ORDERING
     serializer_class = GetListSerializer
+    pagination_class = PostsPaginator
     permission_classes = [PostPermissions]
+
+    def get_queryset(self) -> QuerySet:
+        return Post.objects.get_active_posts()
 
     def post(
             self,
@@ -117,21 +124,12 @@ class Search(ListAPIView):
     """
     serializer_class = GetListSerializer
     permission_classes = [PostPermissions]
+    pagination_class = PostsPaginator
 
     def get_queryset(self):
         query = self.request.GET.get("q")
 
-        return Post.objects.filter(
-            Q(title__icontains=query)
-            |
-            Q(excerpt=query)
-            |
-            Q(text__icontains=query)
-        ).order_by(
-            "-{}".format(
-                BaseModel.Field.created_at
-            )
-        )
+        return Post.objects.search_posts(query)
 
 
 class PostDetails(RetrieveUpdateDestroyAPIView):

@@ -17,6 +17,7 @@ class HouseRules(ListCreateAPIView):
 
     queryset = HouseRule.objects.all()
     serializer_class = HouseRuleSerializer
+    pagination_class = None
     permission_classes = [HouseRulePermissions]
 
 

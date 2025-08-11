@@ -17,6 +17,7 @@ class Amenities(ListCreateAPIView):
 
     queryset = Amenity.objects.all()
     serializer_class = AmenitySerializer
+    pagination_class = None
     permission_classes = [AmenityPermissions]
 
 
