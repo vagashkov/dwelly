@@ -1,5 +1,7 @@
 {% extends "_base.html" %}
 
+{% load static %}
+
 {% block title %}Details{% endblock%}
 
 {% block content%}
@@ -10,13 +12,14 @@
 
     <!-- Listing photos -->
     <section class="row mb-3">
+        {% if listing.get_photos %}
         <div class ="carousel slide" id="photos-carousel" >
             <!-- The carousel itself -->
             <div class ="carousel-inner" >
                 {% for photo in listing.get_photos %}
                     <div class ="carousel-item {% if forloop.first %}active{% endif %}" >
                         <img
-                                src = "{{ photo.file.url }}"
+                                src = "{{ photo.get_details }}"
                                 alt = "{{ photo.title }}"
                                 class ="d-block w-100">
                             <div class ="carousel-caption d-none d-md-block bg-secondary opacity-50 rounded-2" >
@@ -39,6 +42,9 @@
                 <span class="visually-hidden">Next</span>
             </button>
         </div>
+        {% else %}
+        <img src="{% static 'images/defaults/listing_details.webp' %}" alt="{{ listing.title }}" class="img-fluid card-img-top">
+        {% endif %}
     </section>
 
     <!-- Main data -->

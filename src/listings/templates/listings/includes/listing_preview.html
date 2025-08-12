@@ -1,16 +1,17 @@
 {% load static %}
-<div class="card my-3" style="width: 18rem;">
-    <img
-            {% if listing.get_cover_photo.file.url %}
-                src="{{ listing.get_cover_photo.get_preview }}"
-            {% else %}
-                src="{% static 'images/defaults/listing_cover.png' %}"
-            {% endif%}
-            class="card-img-top my-2"
-            alt="{{ listing.title }}">
-  <div class="card-body">
-    <h5 class="card-title">{{ listing.title }}</h5>
-    <p class="card-text">{{ listing.description }}</p>
-    <a href="{{ listing.get_absolute_url }}" class="btn btn-sm bg-dark bg-opacity-75 text-light d-block stretched-link">View</a>
-  </div>
+<div class="card col-lg-4 mb-4">
+  <a href="{{ listing.get_absolute_url }}">
+    {% if listing.get_cover_photo %}
+      <img src="{{ listing.get_cover_photo.get_preview }}" alt="{{ listing.title }}" class="img-fluid card-img-top">
+    {% else %}
+      <img src="{% static 'images/defaults/listing_cover.webp' %}" alt="{{ listing.title }}" class="img-fluid card-img-top">
+    {% endif %}
+    </a>
+    <div class="card-body">
+        <a href="{{ listing.get_absolute_url }}" class="link-secondary">
+            <h2 class="card-title h4">{{ listing.title }}</h2>
+        </a>
+        <p class="card-text mt-4">{{ listing.object_type.name }}</p>
+        <a href="{{ post.get_absolute_url }}" class="link-secondary">Read more...</a>
+    </div>
 </div>

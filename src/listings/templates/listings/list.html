@@ -12,13 +12,13 @@
             </div>
         </div>
     </header>
-    <!-- all posts -->
-    <main class="container bg-light text-dark">
-        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 d-flex d-flex justify-content-between">
+    <!-- all listings -->
+    <main class="container">
+        <div class="row">
             {% for listing in listings %}
                 {% include "listings/includes/listing_preview.html" %}
             {% endfor %}
         </div>
     </main>
-    <!-- all posts -->
+    <!-- all listings -->
 {% endblock content %}

@@ -1,13 +1,15 @@
+from django.conf import settings
 from django.db.models import (
     CharField, SlugField, TextField,
     BooleanField, PositiveSmallIntegerField,
-    TimeField,
-    ForeignKey, PROTECT, ManyToManyField
+    TimeField, ImageField, QuerySet,
+    ForeignKey, PROTECT, CASCADE, ManyToManyField
 )
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from core.models import BaseModel, Reference
+from core.utils.images import convert_image, create_thumbnails
 
 
 APP_NAME = "listings"
@@ -96,6 +98,7 @@ class Listing(BaseModel):
         instant_booking: str = "instant_booking"
         # Other data
         absolute_url: str = "absolute_url"
+        cover_photo: str = "cover_photo"
 
     LOOKUP_KEY = "slug"
 
@@ -201,3 +204,117 @@ class Listing(BaseModel):
 
     def get_absolute_url(self) -> str:
         return reverse("listings:details", args=[self.slug])
+
+    def get_cover_photo(self) -> "Photo":
+        if self.photos:
+            try:
+                return self.photos.get(
+                    is_cover=True
+                )
+            except Photo.DoesNotExist:
+                pass
+
+    def get_photos(self) -> "QuerySet[Photo]":
+        if self.photos:
+            return self.photos.order_by(
+                Photo.Field.index
+            )
+
+
+def upload_path(instance: Listing, filename: str) -> str:
+    return "{}/{}/{}/{}".format(
+        APP_NAME,
+        instance.listing.uuid,
+        "photos",
+        filename
+    )
+
+
+class Photo(BaseModel):
+    """
+    Class to store listing photos
+    """
+
+    class Field:
+        index: str = "index"
+        title: str = "title"
+        file: str = "file"
+        listing: str = "listing"
+        is_cover: str = "is_cover"
+
+    index: PositiveSmallIntegerField = PositiveSmallIntegerField(
+        null=False,
+        verbose_name=_("Index")
+    )
+
+    title: CharField = CharField(
+        null=False,
+        blank=True,
+        default="",
+        max_length=64,
+        verbose_name=_("Title")
+    )
+
+    file: ImageField = ImageField(
+        upload_to=upload_path,
+        verbose_name=_("File")
+    )
+
+    listing: ForeignKey = ForeignKey(
+        Listing,
+        related_name="photos",
+        on_delete=CASCADE,
+        verbose_name=_("Listing")
+    )
+
+    is_cover: BooleanField = BooleanField(
+        null=False,
+        blank=True,
+        default=False
+    )
+
+    def __str__(self) -> str:
+        return "{}".format(self.title)
+
+    def save(self, *args: list, **kwargs: dict) -> None:
+        # Save original to database and obtain it's storage name
+        super().save(*args, **kwargs)
+
+        if self.file:
+            # Build image previews if necessary
+            if settings.IMAGE_SIZES:
+                for size in settings.IMAGE_SIZES:
+                    create_thumbnails.delay(
+                        self.file.path,
+                        size[0],
+                        size[1],
+                        settings.IMAGE_FORMAT
+                    )
+            # Convert image format if necessary
+            if settings.IMAGE_CONVERT_ORIGINAL:
+                convert_image.delay(
+                    self.file.path,
+                    settings.IMAGE_FORMAT
+                )
+
+    def get_preview(self) -> str:
+        dot: int = self.file.url.rfind(".")
+        file_name: str = self.file.url[:dot]
+
+        return "{}_{}x{}.{}".format(
+            file_name,
+            str(settings.IMAGE_SIZE_SMALL[0]),
+            str(settings.IMAGE_SIZE_SMALL[1]),
+            settings.IMAGE_FORMAT
+        )
+
+    def get_details(self) -> str:
+        dot: int = self.file.url.rfind(".")
+        file_name: str = self.file.url[:dot]
+
+        return "{}_{}x{}.{}".format(
+            file_name,
+            str(settings.IMAGE_SIZE_MEDIUM[0]),
+            str(settings.IMAGE_SIZE_MEDIUM[1]),
+            settings.IMAGE_FORMAT
+        )
