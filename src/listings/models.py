@@ -242,6 +242,8 @@ class Photo(BaseModel):
         listing: str = "listing"
         is_cover: str = "is_cover"
 
+    SORT_KEY = Field.index
+
     index: PositiveSmallIntegerField = PositiveSmallIntegerField(
         null=False,
         verbose_name=_("Index")

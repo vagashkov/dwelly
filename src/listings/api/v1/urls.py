@@ -28,6 +28,6 @@ urlpatterns = [
     path(
         "",
         Listings.as_view(),
-        name="api_listings"
+        name="api_list"
     )
 ]

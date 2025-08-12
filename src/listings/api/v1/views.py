@@ -15,7 +15,7 @@ from rest_framework.status import (
 
 from core.api.paginators import BasePaginator
 
-from ...constants import ERROR_KEY
+from ...constants import ERROR_KEY, LISTINGS_ORDERING
 from ...models import Listing
 
 from .permissions import ListingPermissions
@@ -30,10 +30,14 @@ class Listings(ListCreateAPIView):
     Manages object types listing and new object types creation
     """
 
-    queryset = Listing.objects.all()
     serializer_class = GetListingDigest
     pagination_class = BasePaginator
     permission_classes = [ListingPermissions]
+
+    def get_queryset(self):
+        return Listing.objects.all().order_by(
+            LISTINGS_ORDERING
+        )
 
     def create(
             self,
