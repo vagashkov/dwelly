@@ -24,6 +24,12 @@ urlpatterns = [
         ListingDetails.as_view(),
         name="api_listing_details"
     ),
+    path(
+        "<slug:slug>/photos/",
+        include(
+            "listings.api.v1.photos.urls"
+        )
+    ),
     # Listing list
     path(
         "",

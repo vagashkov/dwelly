@@ -2,7 +2,9 @@ from rest_framework.serializers import (
     ModelSerializer, SerializerMethodField
 )
 
-from ...models import Listing, Photo
+from .photos.serializers import PhotoSerializer
+
+from ...models import Listing
 
 
 class GetListingDigest(ModelSerializer):
@@ -34,22 +36,10 @@ class GetListingDetails(GetListingDigest):
     photos = SerializerMethodField("get_photos")
 
     def get_photos(self, obj: Listing) -> list:
-        photos: list = []
-        # Get all photos for this listing
-        for photo in Photo.objects.filter(
-                listing=obj.id
-        ).order_by(
-            Photo.SORT_KEY
-        ):
-            photo_description: dict = dict()
-            photo_description[Photo.Field.title]: str = photo.title
-            photo_description[Photo.Field.index]: int = photo.index
-            photo_description[Photo.Field.is_cover]: bool = photo.is_cover
-            photo_description["preview"]: str = photo.get_preview()
-            photo_description["details"]: str = photo.get_details()
-
-            photos.append(photo_description)
-        return photos
+        return PhotoSerializer(
+            obj.get_photos(),
+            many=True
+        ).data
 
     class Meta:
         model = Listing

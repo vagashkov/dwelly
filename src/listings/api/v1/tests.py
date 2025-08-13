@@ -39,9 +39,9 @@ good_listing = {
 }
 
 
-class ListingsAPITest(BaseAPITest):
+class BaseListingsAPITest(BaseAPITest):
     """
-    Base class for listings and related entities testing
+    Base class for listings and photos endpoint testing
     """
 
     def upload_cover(self, listing: Listing) -> None:
@@ -118,6 +118,12 @@ class ListingsAPITest(BaseAPITest):
             rmtree(TEST_DIR)
         except OSError:
             pass
+
+
+class ListingsAPITest(BaseListingsAPITest):
+    """
+    Base class for listings and related entities testing
+    """
 
     def test_create_listing_no_auth(self) -> None:
         # Create new listing without authentication
