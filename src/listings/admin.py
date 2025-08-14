@@ -9,7 +9,7 @@ from core.models import Reference
 
 from .models import (
     ObjectType, Category, Amenity,
-    HouseRule, Listing, Photo
+    HouseRule, Listing, Photo, PriceTag
 )
 
 APP_NAME = "listings"
@@ -123,9 +123,23 @@ class PhotoAdmin(ModelAdmin):
         )
 
 
+class PriceTagAdmin(ModelAdmin):
+    """
+    Simple class for editing listing price tags using admin panel
+    """
+
+    list_display = (
+        PriceTag.Field.listing,
+        PriceTag.Field.start_date,
+        PriceTag.Field.end_date,
+        PriceTag.Field.price
+    )
+
+
 site.register(ObjectType, ObjectTypeAdmin)
 site.register(Category, CategoryAdmin)
 site.register(Amenity, AmenityAdmin)
 site.register(HouseRule, HouseRuleAdmin)
 site.register(Listing, ListingAdmin)
 site.register(Photo, PhotoAdmin)
+site.register(PriceTag, PriceTagAdmin)

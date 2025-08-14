@@ -2,11 +2,13 @@ from django.conf import settings
 from django.db.models import (
     CharField, SlugField, TextField,
     BooleanField, PositiveSmallIntegerField,
-    TimeField, ImageField, QuerySet,
+    DateField, TimeField, ImageField, QuerySet,
     ForeignKey, PROTECT, CASCADE, ManyToManyField
 )
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
+from djmoney.models.fields import MoneyField
 
 from core.models import BaseModel, Reference
 from core.utils.images import convert_image, create_thumbnails
@@ -319,4 +321,58 @@ class Photo(BaseModel):
             str(settings.IMAGE_SIZE_MEDIUM[0]),
             str(settings.IMAGE_SIZE_MEDIUM[1]),
             settings.IMAGE_FORMAT
+        )
+
+
+class PriceTag(BaseModel):
+    """
+    Stores listing price for some period
+    """
+
+    class Field:
+        listing: str = "listing"
+        start_date: str = "start_date"
+        end_date: str = "end_date"
+        price: str = "price"
+        description: str = "description"
+
+    listing: ForeignKey = ForeignKey(
+        Listing,
+        related_name="price_tags",
+        on_delete=CASCADE,
+        verbose_name=_("Listing")
+    )
+
+    start_date: DateField = DateField(
+        null=False,
+        blank=False,
+        verbose_name=_("Start date")
+    )
+
+    end_date: DateField = DateField(
+        null=False,
+        blank=False,
+        verbose_name=_("End date")
+    )
+
+    price: MoneyField = MoneyField(
+        null=False,
+        max_digits=19,
+        decimal_places=4,
+        default_currency=settings.BASE_CURRENCY
+    )
+
+    description: CharField = CharField(
+        null=False,
+        blank=True,
+        default="",
+        max_length=512,
+        verbose_name=_("Description")
+    )
+
+    def __str__(self) -> str:
+        return "{} - {}: {}".format(
+            self.start_date.strftime("%b %d, %Y"),
+            self.end_date.strftime("%b %d, %Y"),
+            self.price
         )

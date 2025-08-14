@@ -1,3 +1,5 @@
+from datetime import date
+from dateutil.relativedelta import relativedelta
 from os import mkdir
 from os.path import exists
 from shutil import rmtree
@@ -12,7 +14,7 @@ from django.utils.text import slugify
 
 from .models import (
     ObjectType, Category, Amenity, HouseRule,
-    Listing, Photo
+    Listing, Photo, PriceTag
 )
 
 good_listing = {
@@ -145,6 +147,17 @@ class ListingTests(TestCase):
         )
         self.listing.save()
 
+        # Append price tags
+        for index in range(5):
+            PriceTag.objects.create(
+                listing=self.listing,
+                start_date=date.today() + relativedelta(months=index),
+                end_date=date.today() + relativedelta(
+                    months=index + 1, days=-1
+                ),
+                price=100 - index * 20
+            )
+
         self.upload_cover(self.listing)
 
     def tearDown(self) -> None:
@@ -171,7 +184,7 @@ class ListingTests(TestCase):
         no_response = self.client.get("/listing/wrong")
         self.assertEqual(no_response.status_code, 404)
 
-    def test_existing_post_details(self) -> None:
+    def test_existing_listing_details(self) -> None:
         # Checking existing listing details
         response = self.client.get(self.listing.get_absolute_url())
         self.assertEqual(response.status_code, 200)
@@ -193,6 +206,11 @@ class ListingTests(TestCase):
             self.assertContains(
                 response,
                 rule.name
+            )
+        for price_tag in self.listing.price_tags.all():
+            self.assertContains(
+                response,
+                price_tag
             )
 
         self.assertContains(

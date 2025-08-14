@@ -50,7 +50,6 @@
     <!-- Main data -->
     <section class="row border rounded-3 m-1">
         <dl>
-            <dt class="col-3 d-inline-block">Hosts:</dt><dd class="col-9 d-inline-block">{% for host in listing.hosts.all %}{{ host.email }}{% endfor %}</dd>
             <dt class="col-3 d-inline-block">Type:</dt><dd class="col-9 d-inline-block">{{ listing.object_type.name }}</dd>
             <dt class="col-3 d-inline-block">Description:</dt><dd class="col-9 d-inline-block">{{ listing.description }}</dd>
             <dt class="col-3 d-inline-block">Max guests:</dt><dd class="col-9 d-inline-block">{{ listing.max_guests }}</dd>
@@ -82,6 +81,20 @@
                 <ul class="list-group list-group-horizontal">
                     {% for rule in listing.house_rules.all %}
                         <li class="list-group-item"> {{ rule.name }} </li>
+                    {% endfor %}
+                </ul>
+            </dd>
+        </dl>
+    </section>
+
+    <!-- Price tags -->
+    <section class="row border rounded m-1">
+        <dl>
+            <dt>Prices:</dt>
+            <dd>
+                <ul class="list-group list-group-vertical">
+                    {% for price_tag in listing.price_tags.all %}
+                        <li class="list-group-item"> {{ price_tag.start_date|date:"M d, Y" }} - {{ price_tag.end_date|date:"M d, Y" }}: {{ price_tag.price }} </li>
                     {% endfor %}
                 </ul>
             </dd>

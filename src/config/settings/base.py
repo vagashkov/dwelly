@@ -27,6 +27,8 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "dj_rest_auth",
     "drf_spectacular",
+    # Currencies support
+    "djmoney",
 ]
 PROJECT_APPS = [
     "users.apps.UsersConfig",
@@ -154,3 +156,11 @@ IMAGE_SIZES = {
 }
 IMAGE_CONVERT_ORIGINAL = True
 IMAGE_KEEP_ORIGINAL = False
+
+# Supported currencies
+CURRENCIES = [
+    "USD",
+    "EUR",
+    "CNY"
+]
+BASE_CURRENCY = "EUR"
