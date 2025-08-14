@@ -3,6 +3,7 @@ from rest_framework.serializers import (
 )
 
 from .photos.serializers import PhotoSerializer
+from .price_tags.serializers import PriceTagSerializer
 
 from ...models import Listing
 
@@ -41,6 +42,14 @@ class GetListingDetails(GetListingDigest):
             many=True
         ).data
 
+    price_tags = SerializerMethodField("get_price_tags")
+
+    def get_price_tags(self, obj: Listing) -> list:
+        return PriceTagSerializer(
+            obj.get_price_tags(),
+            many=True
+        ).data
+
     class Meta:
         model = Listing
         fields = [
@@ -61,7 +70,8 @@ class GetListingDetails(GetListingDigest):
             Listing.Field.check_out_time,
             Listing.Field.instant_booking,
             # Other info
-            "photos"
+            "photos",
+            "price_tags"
             ]
 
 

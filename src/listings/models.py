@@ -222,6 +222,12 @@ class Listing(BaseModel):
                 Photo.Field.index
             )
 
+    def get_price_tags(self) -> "QuerySet[PriceTag]":
+        if self.price_tags:
+            return self.price_tags.order_by(
+                PriceTag.Field.start_date
+            )
+
 
 def upload_path(instance: Listing, filename: str) -> str:
     return "{}/{}/{}/{}".format(

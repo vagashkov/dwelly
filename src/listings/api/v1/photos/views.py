@@ -1,3 +1,4 @@
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -6,6 +7,8 @@ from rest_framework.status import (
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 
+from ....models import Listing, Photo
+
 from .constants import (
     ERROR_KEY,
     ERROR_MSG_NO_PHOTO_ATTACHED,
@@ -13,8 +16,6 @@ from .constants import (
     ERROR_MSG_NO_PHOTO_TITLE,
     ERROR_MSG_UNKNOWN_LISTING
 )
-from ....models import Listing, Photo
-
 from .permissions import PhotoPermissions
 from .serializers import PhotoSerializer
 
@@ -25,7 +26,21 @@ class PhotosList(ListCreateAPIView):
     """
 
     order_by = Photo.Field.index
+    serializer_class = PhotoSerializer
     permission_classes = [PhotoPermissions]
+
+    def get_queryset(self):
+        try:
+            listing = Listing.objects.get(
+                slug=self.kwargs.get(Listing.Field.slug)
+            )
+            return listing.get_photos()
+        except Listing.DoesNotExist:
+            raise NotFound(
+                ERROR_MSG_UNKNOWN_LISTING.format(
+                    self.kwargs.get(Listing.Field.slug)
+                )
+            )
 
     def post(
             self,
@@ -79,7 +94,7 @@ class PhotosList(ListCreateAPIView):
 
         is_cover = request.data.get(Photo.Field.is_cover, False)
 
-        # Then check if listing id for photo provided
+        # Then check if listing slug for photo provided
         slug = self.kwargs.get(
             Listing.Field.slug
         )

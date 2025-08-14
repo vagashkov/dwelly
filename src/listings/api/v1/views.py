@@ -1,7 +1,6 @@
 from pydantic import ValidationError
 from pyngo import drf_error_details
 
-
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView

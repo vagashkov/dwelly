@@ -30,6 +30,12 @@ urlpatterns = [
             "listings.api.v1.photos.urls"
         )
     ),
+    path(
+        "<slug:slug>/price_tags/",
+        include(
+            "listings.api.v1.price_tags.urls"
+        )
+    ),
     # Listing list
     path(
         "",
