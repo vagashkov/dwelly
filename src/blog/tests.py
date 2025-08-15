@@ -11,6 +11,7 @@ from django.urls import reverse
 
 from tests.test_data import create_good_user
 
+from .constants import ACTIVE_POST_STATUS
 from .models import Tag, Status, Post, Comment
 
 TEST_DIR = settings.BASE_DIR / "test_data"
@@ -68,22 +69,34 @@ class PostTests(BaseTest):
             name="Test tag",
             description="Some test tag"
         )
-        self.status = Status.objects.create(
+        self.draft_status = Status.objects.create(
             name="Draft"
         )
-        self.post = Post.objects.create(
-            title="Test post",
-            excerpt="Test excerpt",
-            author=self.author,
-            text="Some test post content",
-            slug="test-post",
-            status=self.status
+        self.active_status = Status.objects.create(
+            name=ACTIVE_POST_STATUS
         )
-        self.post.tags.set([self.tag])
-        self.upload_cover(self.post)
-        self.post.save()
+        self.active_post = Post.objects.create(
+            title="Active post",
+            excerpt="Active post excerpt",
+            author=self.author,
+            text="Some active post content",
+            slug="active-post",
+            status=self.active_status
+        )
+        self.draft_post = Post.objects.create(
+            title="Draft post",
+            excerpt="Draft post excerpt",
+            author=self.author,
+            text="Some draft post content",
+            slug="draft-post",
+            status=self.draft_status
+        )
+
+        self.active_post.tags.set([self.tag])
+        self.upload_cover(self.active_post)
+        self.active_post.save()
         self.comment = Comment.objects.create(
-            post=self.post,
+            post=self.active_post,
             author=self.author,
             text="Comment content"
         )
@@ -91,8 +104,23 @@ class PostTests(BaseTest):
     def test_posts_list(self) -> None:
         response = self.client.get(reverse("blog:posts"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Test post")
-        self.assertContains(response, "Test excerpt")
+        self.assertContains(response, "Active post")
+        self.assertContains(response, "Active post excerpt")
+        self.assertNotContains(response, "Draft post")
+        self.assertTemplateUsed(response, "blog/posts.html")
+
+    def test_search_posts(self) -> None:
+        response = self.client.get(
+            reverse(
+                "blog:search",
+                query={
+                    "q": "Active post"
+                }
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Active post")
+        self.assertContains(response, "Active post excerpt")
         self.assertTemplateUsed(response, "blog/posts.html")
 
     def test_unknown_post_details(self) -> None:
@@ -100,20 +128,20 @@ class PostTests(BaseTest):
         self.assertEqual(no_response.status_code, 404)
 
     def test_existing_post_details(self) -> None:
-        response = self.client.get(self.post.get_absolute_url())
+        response = self.client.get(self.active_post.get_absolute_url())
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Test post")
         self.assertTemplateUsed(response, "blog/post_details.html")
         # Checking post data
         self.assertContains(response, self.author.email)
         self.assertContains(response, self.tag.name)
-        self.assertContains(response, "Test post")
-        self.assertContains(response, "Some test post content")
+        self.assertContains(response, "Active post")
+        self.assertContains(response, "Some active post content")
         self.assertContains(
             response,
-            "post_cover_{}x{}.jpg".format(
+            "post_cover_{}x{}.{}".format(
                 settings.IMAGE_SIZE_MEDIUM[0],
-                settings.IMAGE_SIZE_MEDIUM[1]
+                settings.IMAGE_SIZE_MEDIUM[1],
+                settings.IMAGE_FORMAT
                 )
         )
         # Checking comments section

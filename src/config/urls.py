@@ -22,6 +22,15 @@ urlpatterns = [
         ),
     ),
 
+    # listings application urls
+    path(
+        "listings/",
+        include(
+            "listings.urls",
+            namespace="listings"
+        ),
+    ),
+
 
     # user accounts and profiles management
     path(

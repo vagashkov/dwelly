@@ -10,6 +10,7 @@ from rest_framework.status import (
 )
 
 from .....constants import (
+    COMMENTS_ORDERING,
     ERROR_KEY,
     ERROR_MSG_NO_POST_SLUG,
     ERROR_MSG_NO_POST,
@@ -17,6 +18,7 @@ from .....constants import (
 )
 from .....models import Post, Comment
 
+from .paginators import CommentsPaginator
 from .permissions import CommentPermissions
 from .serializers import GetComments, PostComment
 from .validators import CommentValidator
@@ -28,7 +30,14 @@ class Comments(ListCreateAPIView):
     """
 
     queryset = Comment.objects.all()
+    order_by = COMMENTS_ORDERING
+    pagination_class = CommentsPaginator
     permission_classes = [CommentPermissions]
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return PostComment
+        return GetComments
 
     def create(
             self,
@@ -151,7 +160,9 @@ class Comments(ListCreateAPIView):
                 }
             )
 
-        queryset = post.comments
+        queryset = post.comments.all().order_by(
+            COMMENTS_ORDERING
+        )
 
         # Should we use pagination?
         page = self.paginate_queryset(queryset)

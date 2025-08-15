@@ -195,5 +195,6 @@ class Profile(BaseModel):
                     settings.MEDIA_ROOT.joinpath(
                         self.photo.name
                     ),
-                    *AVATAR_DIMENSIONS.get(size)
+                    *AVATAR_DIMENSIONS.get(size),
+                    settings.IMAGE_FORMAT
                 )

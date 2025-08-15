@@ -1,0 +1,17 @@
+{% load static %}
+<div class="card col-lg-4 mb-4">
+  <a href="{{ listing.get_absolute_url }}">
+    {% if listing.get_cover_photo %}
+      <img src="{{ listing.get_cover_photo.get_preview }}" alt="{{ listing.title }}" class="img-fluid card-img-top">
+    {% else %}
+      <img src="{% static 'images/defaults/listing_cover.webp' %}" alt="{{ listing.title }}" class="img-fluid card-img-top">
+    {% endif %}
+    </a>
+    <div class="card-body">
+        <a href="{{ listing.get_absolute_url }}" class="link-secondary">
+            <h2 class="card-title h4">{{ listing.title }}</h2>
+        </a>
+        <p class="card-text mt-4">{{ listing.object_type.name }}</p>
+        <a href="{{ post.get_absolute_url }}" class="link-secondary">Read more...</a>
+    </div>
+</div>

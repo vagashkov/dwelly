@@ -11,7 +11,9 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from core.models import BaseModel, Reference
-from core.utils.images import create_thumbnails
+from core.utils.images import convert_image, create_thumbnails
+
+from .managers import PostManager
 
 APP_NAME = "blog"
 
@@ -76,6 +78,10 @@ class Postable(BaseModel):
     )
 
 
+def get_default_status():
+    return Status.objects.get(is_initial=True)
+
+
 class Post(Postable):
     """
     Blog post class
@@ -127,10 +133,13 @@ class Post(Postable):
         Status,
         null=False,
         blank=False,
+        default=get_default_status,
         related_name="posts",
         on_delete=PROTECT,
         verbose_name=_("Status")
     )
+
+    objects = PostManager()
 
     def __str__(self) -> str:
         return "{}".format(self.title)
@@ -150,11 +159,20 @@ class Post(Postable):
         super().save(*args, **kwargs)
 
         if self.cover:
-            for size in settings.IMAGE_SIZES:
-                create_thumbnails.delay(
+            # Build image previews if necessary
+            if settings.IMAGE_SIZES:
+                for size in settings.IMAGE_SIZES:
+                    create_thumbnails.delay(
+                        self.cover.path,
+                        size[0],
+                        size[1],
+                        settings.IMAGE_FORMAT
+                    )
+            # Convert image format if necessary
+            if settings.IMAGE_CONVERT_ORIGINAL:
+                convert_image.delay(
                     self.cover.path,
-                    size[0],
-                    size[1]
+                    settings.IMAGE_FORMAT
                 )
 
     def get_absolute_url(self) -> str:
@@ -163,25 +181,23 @@ class Post(Postable):
     def cover_preview(self):
         dot = self.cover.url.rfind(".")
         file_name = self.cover.url[:dot]
-        file_extension = self.cover.url[dot + 1:]
 
         return "{}_{}x{}.{}".format(
                         file_name,
                         str(settings.IMAGE_SIZE_SMALL[0]),
                         str(settings.IMAGE_SIZE_SMALL[1]),
-                        file_extension
+                        settings.IMAGE_FORMAT
                     )
 
     def cover_details(self):
         dot = self.cover.url.rfind(".")
         file_name = self.cover.url[:dot]
-        file_extension = self.cover.url[dot + 1:]
 
         return "{}_{}x{}.{}".format(
                         file_name,
                         str(settings.IMAGE_SIZE_MEDIUM[0]),
                         str(settings.IMAGE_SIZE_MEDIUM[1]),
-                        file_extension
+                        settings.IMAGE_FORMAT
                     )
 
 

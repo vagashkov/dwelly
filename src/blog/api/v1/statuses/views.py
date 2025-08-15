@@ -15,6 +15,7 @@ class Statuses(ListCreateAPIView):
 
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
+    pagination_class = None
     permission_classes = [StatusPermissions]
 
 

@@ -216,7 +216,7 @@ class ProfileTest(APITestCase):
 
         # checking profiles number (admin + user = 2)
         self.assertEqual(
-            len(response.data),
+            len(response.data.get("results")),
             2
         )
 

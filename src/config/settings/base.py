@@ -27,10 +27,13 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "dj_rest_auth",
     "drf_spectacular",
+    # Currencies support
+    "djmoney",
 ]
 PROJECT_APPS = [
     "users.apps.UsersConfig",
     "blog.apps.BlogConfig",
+    "listings.apps.ListingsConfig"
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
@@ -115,6 +118,9 @@ REST_FRAMEWORK = {
         # "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    # Default pagination settings
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",  # noqa: E501
+    "PAGE_SIZE": 10,
 }
 
 # drf_spectacular-related settings
@@ -139,6 +145,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Image processing related parameters
+IMAGE_FORMAT = "webp"
 IMAGE_QUALITY = 95
 IMAGE_DPI = 254
 IMAGE_SIZE_SMALL = (408, 272)
@@ -147,3 +154,13 @@ IMAGE_SIZES = {
     IMAGE_SIZE_SMALL,
     IMAGE_SIZE_MEDIUM
 }
+IMAGE_CONVERT_ORIGINAL = True
+IMAGE_KEEP_ORIGINAL = False
+
+# Supported currencies
+CURRENCIES = [
+    "USD",
+    "EUR",
+    "CNY"
+]
+BASE_CURRENCY = "EUR"

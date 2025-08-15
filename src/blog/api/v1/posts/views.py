@@ -1,8 +1,11 @@
 import PIL
 from PIL import Image
 from pydantic import ValidationError
+
+from django.db.models import QuerySet
+
 from rest_framework.generics import (
-    ListCreateAPIView, RetrieveUpdateDestroyAPIView
+    ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 )
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -23,9 +26,12 @@ from ....constants import (
     ERROR_MSG_NO_IMAGE_ATTACHED,
     ERROR_MSG_UNSUPPORTED_IMAGE_FORMAT,
     ERROR_MSG_NO_POST,
-    ERROR_MSG_MULTIPLE_POSTS
+    ERROR_MSG_MULTIPLE_POSTS,
+    POSTS_ORDERING
 )
 from ....models import Post, Status
+
+from .paginators import PostsPaginator
 from .permissions import PostPermissions
 from .serializers import (
     GetListSerializer,
@@ -40,9 +46,13 @@ class Posts(ListCreateAPIView):
     Manages posts listing and new post creation
     """
 
-    queryset = Post.objects.all()
+    order_by = POSTS_ORDERING
     serializer_class = GetListSerializer
+    pagination_class = PostsPaginator
     permission_classes = [PostPermissions]
+
+    def get_queryset(self) -> QuerySet:
+        return Post.objects.get_active_posts()
 
     def post(
             self,
@@ -106,6 +116,20 @@ class Posts(ListCreateAPIView):
             status=HTTP_201_CREATED,
             headers=headers
         )
+
+
+class Search(ListAPIView):
+    """
+    Manages post search routine
+    """
+    serializer_class = GetListSerializer
+    permission_classes = [PostPermissions]
+    pagination_class = PostsPaginator
+
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+
+        return Post.objects.search_posts(query)
 
 
 class PostDetails(RetrieveUpdateDestroyAPIView):
