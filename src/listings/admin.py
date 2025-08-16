@@ -8,8 +8,8 @@ from django.utils.html import mark_safe
 from core.models import Reference
 
 from .models import (
-    ObjectType, Category, Amenity,
-    HouseRule, Listing, Photo, PriceTag
+    ObjectType, Category, Amenity, HouseRule,
+    Listing, Photo, PriceTag, DayRate
 )
 
 APP_NAME = "listings"
@@ -136,6 +136,18 @@ class PriceTagAdmin(ModelAdmin):
     )
 
 
+class DailyRateAdmin(ModelAdmin):
+    """
+    Simple class for editing listing price tags using admin panel
+    """
+
+    list_display = (
+        DayRate.Field.listing,
+        DayRate.Field.date,
+        DayRate.Field.price
+    )
+
+
 site.register(ObjectType, ObjectTypeAdmin)
 site.register(Category, CategoryAdmin)
 site.register(Amenity, AmenityAdmin)
@@ -143,3 +155,4 @@ site.register(HouseRule, HouseRuleAdmin)
 site.register(Listing, ListingAdmin)
 site.register(Photo, PhotoAdmin)
 site.register(PriceTag, PriceTagAdmin)
+site.register(DayRate, DailyRateAdmin)

@@ -31,7 +31,7 @@ urlpatterns = [
         )
     ),
     path(
-        "<slug:slug>/price_tags/",
+        "<slug:slug>/rates/",
         include(
             "listings.api.v1.price_tags.urls"
         )
