@@ -14,7 +14,7 @@ from django.utils.text import slugify
 
 from .models import (
     ObjectType, Category, Amenity, HouseRule,
-    Listing, Photo, PriceTag
+    Listing, Photo, PriceTag, DayRate
 )
 
 good_listing = {
@@ -147,17 +147,6 @@ class ListingTests(TestCase):
         )
         self.listing.save()
 
-        # Append price tags
-        for index in range(5):
-            PriceTag.objects.create(
-                listing=self.listing,
-                start_date=date.today() + relativedelta(months=index),
-                end_date=date.today() + relativedelta(
-                    months=index + 1, days=-1
-                ),
-                price=100 - index * 20
-            )
-
         self.upload_cover(self.listing)
 
     def tearDown(self) -> None:
@@ -217,3 +206,30 @@ class ListingTests(TestCase):
             response,
             self.listing.get_cover_photo().get_details()
         )
+
+    def test_day_rates_created(self) -> None:
+        """
+
+        :return:
+        """
+        # Append price tags
+        for index in range(5):
+            price_tag = PriceTag.objects.create(
+                listing=self.listing,
+                start_date=date.today() + relativedelta(months=index),
+                end_date=date.today() + relativedelta(
+                    months=index + 1, days=-1
+                ),
+                price=100 - index * 20
+            )
+            price_tag.save()
+
+            day_rate = DayRate.objects.get(
+                listing=self.listing,
+                price_tag=price_tag,
+                date=date.today() + relativedelta(months=index)
+            )
+            self.assertEqual(
+                day_rate.price.amount,
+                100-index*20
+            )
