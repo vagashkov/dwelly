@@ -2,7 +2,7 @@ from pydantic import ValidationError
 from pyngo import drf_error_details
 
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -10,19 +10,19 @@ from rest_framework.status import (
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 
-from ....models import Listing, PriceTag
+from ....models import Listing, PriceTag, DayRate
 
 from .constants import (
     ERROR_KEY, ERROR_MSG_UNKNOWN_LISTING
 )
 from .permissions import PriceTagPermissions
-from .serializers import PriceTagSerializer
+from .serializers import PriceTagSerializer, DayRateSerializer
 from .validators import PriceTagValidator
 
 
 class PriceTagsList(ListCreateAPIView):
     """
-    Manages price tags creation
+    Manages price tags listing and creation
     """
 
     order_by = PriceTag.Field.start_date
@@ -69,12 +69,12 @@ class PriceTagsList(ListCreateAPIView):
             )
 
         # Obtain and validate data
-        serializer = PriceTagSerializer(data=request.data)
+        serializer = PriceTagSerializer(
+            data=request.data
+        )
         serializer.is_valid(raise_exception=True)
 
-        # Create new PriceTag instance
-        # self.perform_create(serializer)
-        # Then check if listing slug for photo provided
+        # Get listing slug for price tag
         slug = self.kwargs.get(
             Listing.Field.slug
         )
@@ -94,7 +94,7 @@ class PriceTagsList(ListCreateAPIView):
 
         price_tag = PriceTag.objects.create(
             listing=listing,
-            **request.data
+            **serializer.validated_data
         )
 
         # And return positive response
@@ -102,3 +102,27 @@ class PriceTagsList(ListCreateAPIView):
             status=HTTP_201_CREATED,
             data=PriceTagSerializer(price_tag).data
         )
+
+
+class DayRatesList(ListAPIView):
+    """
+    Manages daily rates listing
+    """
+
+    order_by = DayRate.Field.date
+    serializer_class = DayRateSerializer
+
+    def get_queryset(self):
+        try:
+            listing = Listing.objects.get(
+                slug=self.kwargs.get(Listing.Field.slug)
+            )
+            return DayRate.objects.filter(
+                listing=listing
+            )
+        except Listing.DoesNotExist:
+            raise NotFound(
+                ERROR_MSG_UNKNOWN_LISTING.format(
+                    self.kwargs.get(Listing.Field.slug)
+                )
+            )

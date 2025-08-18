@@ -1,4 +1,7 @@
+from datetime import date, timedelta
+
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db.models import (
     CharField, SlugField, TextField,
     BooleanField, PositiveSmallIntegerField,
@@ -13,6 +16,10 @@ from djmoney.models.fields import MoneyField
 from core.models import BaseModel, Reference
 from core.utils.images import convert_image, create_thumbnails
 
+from .constants import (
+    ERROR_MSG_NEGATIVE_DAY_RATE,
+    ERROR_MSG_OVERLAPPING_DATES
+)
 
 APP_NAME = "listings"
 
@@ -330,6 +337,16 @@ class Photo(BaseModel):
         )
 
 
+def daterange_generator(start_date: date, end_date: date):
+    """Generates dates between start_date and end_date (inclusive)."""
+    for counter in range(
+            int(
+                (end_date - start_date).days
+            ) + 1
+    ):
+        yield start_date + timedelta(counter)
+
+
 class PriceTag(BaseModel):
     """
     Stores listing price for some period
@@ -376,9 +393,97 @@ class PriceTag(BaseModel):
         verbose_name=_("Description")
     )
 
+    def clean(self):
+        overlapping_dates = list()
+
+        # First we have to look for potential conflicts
+        for current_date in daterange_generator(
+                self.start_date, self.end_date
+        ):
+            try:
+                day_rate = DayRate.objects.get(
+                    listing=self.listing,
+                    date=current_date,
+                )
+            except DayRate.DoesNotExist:
+                pass
+            else:
+                if day_rate.price_tag != self:
+                    overlapping_dates.append(
+                        current_date.strftime("%Y-%m-%d")
+                    )
+
+        if overlapping_dates:
+            raise ValidationError(
+                ERROR_MSG_OVERLAPPING_DATES.format(
+                    ", ".join(overlapping_dates)
+                )
+            )
+
+        if self.price.amount < 0:
+            raise ValidationError(
+                ERROR_MSG_NEGATIVE_DAY_RATE.format(
+                    self.price.amount)
+                )
+
     def __str__(self) -> str:
         return "{} - {}: {}".format(
             self.start_date.strftime("%b %d, %Y"),
             self.end_date.strftime("%b %d, %Y"),
+            self.price
+        )
+
+
+class DayRate(BaseModel):
+    """
+    Stores listing price for some precise date
+    """
+
+    class Field:
+        listing: str = "listing"
+        price_tag: str = "price_tag"
+        date: str = "date"
+        price: str = "price"
+        description: str = "description"
+
+    listing: ForeignKey = ForeignKey(
+        Listing,
+        related_name="day_rates",
+        on_delete=CASCADE,
+        verbose_name=_("Listing")
+    )
+
+    price_tag: ForeignKey = ForeignKey(
+        PriceTag,
+        related_name="day_rates",
+        on_delete=CASCADE,
+        verbose_name=_("Price tag")
+    )
+
+    date: DateField = DateField(
+        null=False,
+        blank=False,
+        verbose_name=_("Date")
+    )
+
+    price: MoneyField = MoneyField(
+        null=False,
+        max_digits=19,
+        decimal_places=4,
+        default_currency=settings.BASE_CURRENCY
+    )
+
+    description: CharField = CharField(
+        null=False,
+        blank=True,
+        default="",
+        max_length=512,
+        verbose_name=_("Description")
+    )
+
+    def __str__(self) -> str:
+        return "{} on {}: {}".format(
+            self.listing.title,
+            self.date.strftime("%b %d, %Y"),
             self.price
         )
