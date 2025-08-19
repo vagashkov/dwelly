@@ -215,7 +215,7 @@ class Listing(BaseModel):
         )
 
     def get_absolute_url(self) -> str:
-        return reverse("listings:details", args=[self.slug])
+        return reverse("listings:listing_details", args=[self.slug])
 
     def get_cover_photo(self) -> "Photo":
         if self.photos:
@@ -344,7 +344,6 @@ class Photo(BaseModel):
             str(settings.IMAGE_SIZE_MEDIUM[1]),
             settings.IMAGE_FORMAT
         )
-
 
 
 class PriceTag(BaseModel):

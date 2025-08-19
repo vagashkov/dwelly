@@ -9,5 +9,5 @@ urlpatterns = [
     path("api/", include("listings.api.urls")),
 
     path("", List.as_view(), name="list"),
-    path("<slug:slug>", Details.as_view(), name="details")
+    path("<slug:slug>", Details.as_view(), name="listing_details")
 ]

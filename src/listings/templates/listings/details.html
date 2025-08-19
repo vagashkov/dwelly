@@ -100,5 +100,19 @@
             </dd>
         </dl>
     </section>
+
+    <!-- Reservation form -->
+    <section class="row border rounded m-1">
+        <dl>
+            <dt>Reservation:</dt>
+            <dd>
+                {% if user.is_authenticated %}
+                    {% include "listings/includes/reservation_form.html" %}
+                {% else %}
+                    <p>Please <a href="{% url 'account_login' %}">log in</a> or <a href="{% url 'account_signup' %}">register</a> to view available dates and submit for reservation </p>
+                {% endif %}
+            </dd>
+        </dl>
+    </section>
 </main>
 {% endblock %}
