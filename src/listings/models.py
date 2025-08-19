@@ -1,7 +1,6 @@
-from datetime import date, timedelta
-
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
 from django.db.models import (
     CharField, SlugField, TextField,
     BooleanField, PositiveSmallIntegerField,
@@ -9,17 +8,21 @@ from django.db.models import (
     ForeignKey, PROTECT, CASCADE, ManyToManyField
 )
 from django.urls import reverse
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 from djmoney.models.fields import MoneyField
 
 from core.models import BaseModel, Reference
+from core.utils.dates import daterange_generator
 from core.utils.images import convert_image, create_thumbnails
 
 from .constants import (
     ERROR_MSG_NEGATIVE_DAY_RATE,
     ERROR_MSG_OVERLAPPING_DATES
 )
+
+User = get_user_model()
 
 APP_NAME = "listings"
 
@@ -235,6 +238,12 @@ class Listing(BaseModel):
                 PriceTag.Field.start_date
             )
 
+    def get_reservations(self) -> "QuerySet[Reservation]":
+        if self.reservations:
+            return self.reservations.order_by(
+                Reservation.Field.check_in
+            )
+
 
 def upload_path(instance: Listing, filename: str) -> str:
     return "{}/{}/{}/{}".format(
@@ -336,15 +345,6 @@ class Photo(BaseModel):
             settings.IMAGE_FORMAT
         )
 
-
-def daterange_generator(start_date: date, end_date: date):
-    """Generates dates between start_date and end_date (inclusive)."""
-    for counter in range(
-            int(
-                (end_date - start_date).days
-            ) + 1
-    ):
-        yield start_date + timedelta(counter)
 
 
 class PriceTag(BaseModel):
@@ -487,3 +487,64 @@ class DayRate(BaseModel):
             self.date.strftime("%b %d, %Y"),
             self.price
         )
+
+
+class Reservation(BaseModel):
+    """
+    Class for listing reservations made by users
+    """
+
+    class Field:
+        user: str = "user"
+        listing: str = "listing"
+        check_in: str = "check_in"
+        check_out: str = "check_out"
+        in_progress: str = "in_progress"
+        comment: str = "comment"
+
+    user: ForeignKey = ForeignKey(
+        User,
+        null=False,
+        related_name="reservations",
+        verbose_name=_("User"),
+        on_delete=CASCADE
+    )
+
+    listing: ForeignKey = ForeignKey(
+        Listing,
+        null=False,
+        verbose_name=_("Listing"),
+        related_name="reservations",
+        on_delete=CASCADE
+    )
+
+    check_in: DateField = DateField(
+        null=False,
+        blank=False,
+        verbose_name=_("Check-in")
+    )
+
+    check_out: DateField = DateField(
+        null=False,
+        blank=False,
+        verbose_name=_("Check-out")
+    )
+
+    comment: TextField = TextField(
+        null=False,
+        blank=True,
+        default="",
+        verbose_name=_("Comment")
+    )
+
+    def __str__(self):
+        return "{} {}-{}".format(
+            self.listing.title,
+            self.check_in,
+            self.check_out
+        )
+
+    def in_progress(self):
+        return self.check_in < now().date() < self.check_out
+
+    in_progress.boolean = True

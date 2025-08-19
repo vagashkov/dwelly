@@ -9,7 +9,8 @@ from core.models import Reference
 
 from .models import (
     ObjectType, Category, Amenity, HouseRule,
-    Listing, Photo, PriceTag, DayRate
+    Listing, Photo, PriceTag, DayRate,
+    Reservation
 )
 
 APP_NAME = "listings"
@@ -90,6 +91,16 @@ class ListingAdmin(ModelAdmin):
     Simple class for editing listings using admin panel
     """
 
+    def photos_count(self, listing):
+        return listing.photos.count()
+
+    photos_count.short_description = "Photos"
+
+    def reservations_count(self, listing):
+        return listing.reservations.count()
+
+    reservations_count.short_description = "Reservations"
+
     inlines = (
         PhotoInline,
     )
@@ -103,6 +114,8 @@ class ListingAdmin(ModelAdmin):
     list_display = (
         Listing.Field.title,
         Listing.Field.object_type,
+        "photos_count",
+        "reservations_count",
     )
 
     list_filter = (
@@ -148,6 +161,25 @@ class DailyRateAdmin(ModelAdmin):
     )
 
 
+class ReservationAdmin(ModelAdmin):
+    """
+    Simple class for editing reservations using admin panel
+    """
+
+    list_display = (
+        Reservation.Field.listing,
+        Reservation.Field.user,
+        Reservation.Field.check_in,
+        Reservation.Field.check_out,
+        Reservation.Field.in_progress
+    )
+
+    list_filter = (
+        "listing__title",
+        "user__email",
+    )
+
+
 site.register(ObjectType, ObjectTypeAdmin)
 site.register(Category, CategoryAdmin)
 site.register(Amenity, AmenityAdmin)
@@ -156,3 +188,4 @@ site.register(Listing, ListingAdmin)
 site.register(Photo, PhotoAdmin)
 site.register(PriceTag, PriceTagAdmin)
 site.register(DayRate, DailyRateAdmin)
+site.register(Reservation, ReservationAdmin)
