@@ -69,14 +69,15 @@ class Details(View):
         """
 
         current_listing = self.model.objects.get(slug=slug)
-        reservation_form = ReservationForm(request.POST)
+        reservation_form = ReservationForm(
+            request.POST
+        )
+        reservation_form.instance.listing = current_listing
+        reservation_form.instance.user = request.user
 
         # if form valid - save it and return to post page
         if reservation_form.is_valid():
-            reservation = ReservationForm.save(commit=False)
-            reservation.author = request.user
-            reservation.listing = current_listing
-            reservation.save()
+            reservation_form.save()
             return HttpResponseRedirect(
                 reverse(
                     "listings:listing_details",

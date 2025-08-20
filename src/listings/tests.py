@@ -7,6 +7,7 @@ from shutil import rmtree
 from PIL import Image
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -14,7 +15,7 @@ from django.utils.text import slugify
 
 from .models import (
     ObjectType, Category, Amenity, HouseRule,
-    Listing, Photo, PriceTag, DayRate
+    Listing, Photo, PriceTag, DayRate, Reservation
 )
 
 good_listing = {
@@ -205,6 +206,54 @@ class ListingTests(TestCase):
         self.assertContains(
             response,
             self.listing.get_cover_photo().get_details()
+        )
+
+    def test_reservation_form_anonymous_user(self) -> None:
+        # Checking existing listing details
+        response = self.client.get(self.listing.get_absolute_url())
+        self.assertContains(
+            response,
+            "to view available dates and submit for reservation "
+        )
+
+    def test_reservation_form_registered_user(self) -> None:
+        user = get_user_model().objects.create_user(
+            email="user@test.com",
+            password="VeryStr0ngPwd"
+        )
+        self.client.force_login(user)
+
+        # Checking existing listing details
+        response = self.client.get(self.listing.get_absolute_url())
+        self.assertContains(
+            response,
+            "Submit for reservation"
+        )
+
+    def test_reservation_overlapping_dates(self) -> None:
+        user = get_user_model().objects.create_user(
+            email="user@test.com",
+            password="VeryStr0ngPwd"
+        )
+        self.client.force_login(user)
+        Reservation.objects.create(
+            listing=self.listing,
+            check_in=date.today(),
+            check_out=date.today() + relativedelta(days=7),
+            user=user
+        ).save()
+        # with self.assertRaises(ValidationError):
+        response = self.client.post(
+            self.listing.get_absolute_url(),
+            {
+                "listing": self.listing.slug,
+                "check_in": date.today() + relativedelta(days=1),
+                "check_out": date.today() + relativedelta(days=6)
+            }
+        )
+        self.assertContains(
+            response,
+            "Some overlapping dates were found"
         )
 
     def test_day_rates_created(self) -> None:

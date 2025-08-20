@@ -2,9 +2,9 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.db.models import (
-    CharField, SlugField, TextField,
+    QuerySet, CharField, SlugField, TextField,
     BooleanField, PositiveSmallIntegerField,
-    DateField, TimeField, ImageField, QuerySet,
+    DateField, TimeField, ImageField,
     ForeignKey, PROTECT, CASCADE, ManyToManyField
 )
 from django.urls import reverse
@@ -535,6 +535,34 @@ class Reservation(BaseModel):
         default="",
         verbose_name=_("Comment")
     )
+
+    def clean(self):
+        overlapping_dates = list()
+
+        # First we have to look for potential conflicts
+        for current_date in daterange_generator(
+                self.check_in, self.check_out
+        ):
+            try:
+                reservation = Reservation.objects.get(
+                    listing=self.listing,
+                    check_in__lte=current_date,
+                    check_out__gte=current_date
+                )
+            except Reservation.DoesNotExist:
+                pass
+            else:
+                if reservation != self:
+                    overlapping_dates.append(
+                        current_date.strftime("%Y-%m-%d")
+                        )
+
+        if overlapping_dates:
+            raise ValidationError(
+                ERROR_MSG_OVERLAPPING_DATES.format(
+                    ", ".join(overlapping_dates)
+                )
+            )
 
     def __str__(self):
         return "{} {}-{}".format(
