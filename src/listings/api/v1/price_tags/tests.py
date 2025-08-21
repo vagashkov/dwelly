@@ -10,10 +10,12 @@ from rest_framework.status import (
 )
 
 from ....models import Listing, PriceTag, DayRate
-from ..tests import BaseListingsAPITest
-from .constants import (
+
+from ..constants import (
     ERROR_KEY, ERROR_MSG_UNKNOWN_LISTING
 )
+from ..tests import BaseListingsAPITest
+
 
 good_price_tag = {
     PriceTag.Field.start_date: date.today(),

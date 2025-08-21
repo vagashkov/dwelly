@@ -2,7 +2,7 @@ from pydantic import ValidationError
 from pyngo import drf_error_details
 
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import ListAPIView, ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -10,32 +10,32 @@ from rest_framework.status import (
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 
-from ....models import Listing, PriceTag, DayRate
+from ....models import Listing, Reservation
 
 from ..constants import (
     ERROR_KEY, ERROR_MSG_UNKNOWN_LISTING
 )
 
-from .permissions import PriceTagPermissions
-from .serializers import PriceTagSerializer, DayRateSerializer
-from .validators import PriceTagValidator
+from .permissions import ReservationPermissions
+from .serializers import ReservationSerializer
+from .validators import ReservationValidator
 
 
-class PriceTagsList(ListCreateAPIView):
+class ListingReservations(ListCreateAPIView):
     """
-    Manages price tags listing and creation
+    Manages reservations listing and creation
     """
 
-    order_by = PriceTag.Field.start_date
-    serializer_class = PriceTagSerializer
-    permission_classes = [PriceTagPermissions]
+    order_by = Reservation.Field.check_in
+    serializer_class = ReservationSerializer
+    permission_classes = [ReservationPermissions]
 
     def get_queryset(self):
         try:
             listing = Listing.objects.get(
                 slug=self.kwargs.get(Listing.Field.slug)
             )
-            return listing.get_price_tags()
+            return listing.get_reservations()
         except Listing.DoesNotExist:
             raise NotFound(
                 ERROR_MSG_UNKNOWN_LISTING.format(
@@ -59,7 +59,7 @@ class PriceTagsList(ListCreateAPIView):
 
         # First, validate data using pydantic class
         try:
-            PriceTagValidator.model_validate(request.data)
+            ReservationValidator.model_validate(request.data)
         except ValidationError as error:
             return Response(
                 status=HTTP_422_UNPROCESSABLE_ENTITY,
@@ -70,7 +70,7 @@ class PriceTagsList(ListCreateAPIView):
             )
 
         # Obtain and validate data
-        serializer = PriceTagSerializer(
+        serializer = ReservationSerializer(
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
@@ -93,37 +93,16 @@ class PriceTagsList(ListCreateAPIView):
                 }
             )
 
-        price_tag = PriceTag.objects.create(
+        reservation = Reservation.objects.create(
             listing=listing,
+            user=request.user,
             **serializer.validated_data
         )
 
         # And return positive response
         return Response(
             status=HTTP_201_CREATED,
-            data=PriceTagSerializer(price_tag).data
+            data=ReservationSerializer(
+                reservation
+            ).data
         )
-
-
-class DayRatesList(ListAPIView):
-    """
-    Manages daily rates listing
-    """
-
-    order_by = DayRate.Field.date
-    serializer_class = DayRateSerializer
-
-    def get_queryset(self):
-        try:
-            listing = Listing.objects.get(
-                slug=self.kwargs.get(Listing.Field.slug)
-            )
-            return DayRate.objects.filter(
-                listing=listing
-            )
-        except Listing.DoesNotExist:
-            raise NotFound(
-                ERROR_MSG_UNKNOWN_LISTING.format(
-                    self.kwargs.get(Listing.Field.slug)
-                )
-            )

@@ -12,7 +12,7 @@ class BaseAPITest(APITestCase):
     Base class for amenities testing
     """
 
-    def engage_user(self) -> None:
+    def engage_user(self) -> User:
         # Create and login as standard user
         user = User.objects.create_user(
             email=email,
@@ -21,6 +21,8 @@ class BaseAPITest(APITestCase):
 
         # Login with standard account
         self.client.force_login(user)
+
+        return user
 
     def engage_admin(self) -> None:
         # Create admin account

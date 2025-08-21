@@ -36,6 +36,12 @@ urlpatterns = [
             "listings.api.v1.price_tags.urls"
         )
     ),
+    path(
+        "<slug:slug>/reservations/",
+        include(
+            "listings.api.v1.reservations.urls"
+        )
+    ),
     # Listing list
     path(
         "",
