@@ -1,6 +1,7 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
+from django.conf import settings
 from django.shortcuts import reverse
 
 from rest_framework.status import (
@@ -9,7 +10,7 @@ from rest_framework.status import (
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 
-from ....models import Listing, Reservation
+from ....models import Listing, PriceTag, Reservation
 
 from ..constants import (
     ERROR_KEY, ERROR_MSG_UNKNOWN_LISTING
@@ -39,6 +40,13 @@ class Reservations(BaseListingsAPITest):
         :return:
         """
         self.listing = self.create_good_listing()
+
+        PriceTag.objects.create(
+            listing=self.listing,
+            start_date=date.today(),
+            end_date=date.today() + relativedelta(weeks=5),
+            price=100
+        ).save()
 
     def test_create_reservation_no_auth(self) -> None:
         # Create new listing reservation without authentication
@@ -196,4 +204,14 @@ class Reservations(BaseListingsAPITest):
             self.assertEqual(
                 current_reservation.get(Reservation.Field.check_out),
                 reservations[index].check_out.strftime("%Y-%m-%d")
+            )
+            self.assertIn(
+                Reservation.Field.cost,
+                current_reservation
+            )
+            self.assertEqual(
+                settings.BASE_CURRENCY,
+                current_reservation.get(
+                    Reservation.Field.currency
+                    )
             )

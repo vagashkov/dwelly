@@ -1,5 +1,7 @@
-from django.conf import settings
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import (
     QuerySet, CharField, SlugField, TextField,
@@ -11,6 +13,7 @@ from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
+from djmoney.money import Money
 from djmoney.models.fields import MoneyField
 
 from core.models import BaseModel, Reference
@@ -500,6 +503,8 @@ class Reservation(BaseModel):
         check_out: str = "check_out"
         in_progress: str = "in_progress"
         comment: str = "comment"
+        cost: str = "cost"
+        currency: str = "currency"
 
     user: ForeignKey = ForeignKey(
         User,
@@ -575,3 +580,25 @@ class Reservation(BaseModel):
         return self.check_in < now().date() < self.check_out
 
     in_progress.boolean = True
+
+    @property
+    def cost(self):
+        total_cost = Decimal(0.0)
+
+        # First we have to look for potential conflicts
+        for current_date in daterange_generator(
+                self.check_in, self.check_out
+        ):
+            try:
+                day_rate = DayRate.objects.get(
+                    listing=self.listing,
+                    date=current_date
+                )
+            except Reservation.DoesNotExist:
+                pass
+            else:
+                total_cost += day_rate.price.amount
+
+        return Money(
+            total_cost, settings.BASE_CURRENCY
+        )
