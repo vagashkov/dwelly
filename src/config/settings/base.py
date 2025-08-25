@@ -3,6 +3,8 @@ Django settings for PetHotel project.
 """
 from pathlib import Path
 
+PROJECT_NAME = "Dwelly"
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -33,6 +35,7 @@ THIRD_PARTY_APPS = [
 PROJECT_APPS = [
     "users.apps.UsersConfig",
     "blog.apps.BlogConfig",
+    "core.apps.CoreConfig",
     "listings.apps.ListingsConfig"
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
