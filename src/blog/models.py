@@ -3,14 +3,13 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import (
     ForeignKey, PROTECT, CASCADE, ManyToManyField,
-    BooleanField, CharField, TextField, SlugField,
-    ImageField
+    CharField, TextField, SlugField, ImageField
 )
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from core.models import BaseModel, Reference
+from core.models import BaseModel, Reference, BaseStatus
 from core.utils.images import convert_image, create_thumbnails
 
 from .managers import PostManager
@@ -32,25 +31,6 @@ class Tag(Reference):
     Blog post tags
     """
     pass
-
-
-class Status(Reference):
-    """
-    Blog post statuses
-    """
-    class Meta:
-        verbose_name_plural = "statuses"
-
-    class Field:
-        name: str = "name"
-        description: str = "description"
-        is_initial: str = "is_initial"
-
-    is_initial: BooleanField = BooleanField(
-        null=False,
-        blank=True,
-        default=False
-    )
 
 
 class Postable(BaseModel):
@@ -76,6 +56,10 @@ class Postable(BaseModel):
         null=False,
         blank=False
     )
+
+
+class Status(BaseStatus):
+    pass
 
 
 def get_default_status():

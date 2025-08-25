@@ -16,7 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from djmoney.money import Money
 from djmoney.models.fields import MoneyField
 
-from core.models import BaseModel, Reference
+from core.models import BaseModel, Reference, BaseStatus
 from core.utils.dates import daterange_generator
 from core.utils.images import convert_image, create_thumbnails
 
@@ -491,6 +491,19 @@ class DayRate(BaseModel):
         )
 
 
+class ReservationStatus(BaseStatus):
+    class Meta:
+        verbose_name_plural = "Reservation statuses"
+
+
+def get_default_reservation_status():
+    default_status, _ = ReservationStatus.objects.get_or_create(
+        name="Draft",
+        is_initial=True
+    )
+    return default_status.id
+
+
 class Reservation(BaseModel):
     """
     Class for listing reservations made by users
@@ -505,6 +518,7 @@ class Reservation(BaseModel):
         comment: str = "comment"
         cost: str = "cost"
         currency: str = "currency"
+        status: str = "status"
 
     user: ForeignKey = ForeignKey(
         User,
@@ -539,6 +553,16 @@ class Reservation(BaseModel):
         blank=True,
         default="",
         verbose_name=_("Comment")
+    )
+
+    status: ForeignKey = ForeignKey(
+        ReservationStatus,
+        null=False,
+        blank=False,
+        default=get_default_reservation_status,
+        related_name="listings",
+        on_delete=PROTECT,
+        verbose_name=_("Status")
     )
 
     def clean(self):

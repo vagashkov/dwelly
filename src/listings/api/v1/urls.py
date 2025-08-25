@@ -18,6 +18,12 @@ urlpatterns = [
         "house_rules/",
         include("listings.api.v1.house_rules.urls")
     ),
+    path(
+        "reservations/statuses",
+        include(
+            "listings.api.v1.reservations.statuses.urls"
+        )
+    ),
     # Single listing details
     path(
         "<slug:slug>",

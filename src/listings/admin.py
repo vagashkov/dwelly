@@ -10,7 +10,7 @@ from core.models import Reference
 from .models import (
     ObjectType, Category, Amenity, HouseRule,
     Listing, Photo, PriceTag, DayRate,
-    Reservation
+    Reservation, ReservationStatus
 )
 
 APP_NAME = "listings"
@@ -161,6 +161,18 @@ class DailyRateAdmin(ModelAdmin):
     )
 
 
+class ReservationStatusAdmin(ModelAdmin):
+    """
+    Simple class for editing reservation statuses using admin panel
+    """
+
+    list_display = (
+        ReservationStatus.Field.name,
+        ReservationStatus.Field.description,
+
+    )
+
+
 class ReservationAdmin(ModelAdmin):
     """
     Simple class for editing reservations using admin panel
@@ -190,3 +202,4 @@ site.register(Photo, PhotoAdmin)
 site.register(PriceTag, PriceTagAdmin)
 site.register(DayRate, DailyRateAdmin)
 site.register(Reservation, ReservationAdmin)
+site.register(ReservationStatus, ReservationStatusAdmin)

@@ -3,7 +3,7 @@ import uuid
 from django.conf import settings
 from django.db.models import (
     Model, BigAutoField, UUIDField,
-    CharField, DateTimeField
+    CharField, DateTimeField, BooleanField
 )
 from django.utils.translation import gettext_lazy as _
 
@@ -95,3 +95,23 @@ class Reference(BaseModel):
 
     def __str__(self) -> str:
         return "{}".format(self.name)
+
+
+class BaseStatus(Reference):
+    """
+    Blog post statuses
+    """
+    class Meta:
+        abstract = True
+        verbose_name_plural = "statuses"
+
+    class Field:
+        name: str = "name"
+        description: str = "description"
+        is_initial: str = "is_initial"
+
+    is_initial: BooleanField = BooleanField(
+        null=False,
+        blank=True,
+        default=False
+    )
