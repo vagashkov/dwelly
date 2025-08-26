@@ -1,7 +1,7 @@
 from rest_framework.test import APITestCase
 
 from users.models import User
-from tests.test_data import good_user
+from tests.data import good_user
 
 email = good_user.get(User.Field.email)
 password = good_user.get(User.Field.password)

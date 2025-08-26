@@ -31,5 +31,31 @@
             </div>
         </div>
     </div>
+    <!-- Reservations -->
+    <div class="d-flex align-items-center mb-3">
+        <h5>My reservations</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Room</th>
+                <th scope="col">Date</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+            <tbody>
+            {% for reservation in profile.user.reservations.all %}
+            <tr class="bg-blue">
+                <td class="pt-2">{{ reservation.listing.title }}</td>
+                <td class="pt-2">{{ reservation.check_in }} - {{ reservation.check_out}}</td>
+                <td class="pt-2">{{ reservation.status.name }}</td>
+                <td class="pt-2"><a href="#">Submit</a></td>
+                <td class="pt-2"><a href="#">Cancel</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </main>
 {% endblock content %}

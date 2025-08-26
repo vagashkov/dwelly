@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from tests.test_data import create_good_user
+from tests.objects import create_good_user
 
 from .constants import ACTIVE_POST_STATUS
 from .models import Tag, Status, Post, Comment

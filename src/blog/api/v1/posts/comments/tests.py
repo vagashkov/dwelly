@@ -12,7 +12,7 @@ from rest_framework.test import APITestCase
 
 from .....models import Status, Postable, Post, Comment
 
-from tests.test_data import good_user
+from tests.data import good_user
 
 User = get_user_model()
 email = good_user.get(User.Field.email)

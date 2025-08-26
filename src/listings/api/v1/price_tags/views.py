@@ -110,7 +110,6 @@ class DayRatesList(ListAPIView):
     Manages daily rates listing
     """
 
-    order_by = DayRate.Field.date
     serializer_class = DayRateSerializer
 
     def get_queryset(self):
@@ -120,6 +119,8 @@ class DayRatesList(ListAPIView):
             )
             return DayRate.objects.filter(
                 listing=listing
+            ).order_by(
+                DayRate.Field.date
             )
         except Listing.DoesNotExist:
             raise NotFound(

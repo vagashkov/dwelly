@@ -3,7 +3,7 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.urls import reverse
 
-from tests.test_data import good_user, create_good_user
+from tests.objects import good_user, create_good_user
 
 User = get_user_model()
 email = good_user.get(User.Field.email)

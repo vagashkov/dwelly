@@ -17,7 +17,7 @@ from rest_framework.status import (
 )
 from rest_framework.test import override_settings
 
-from tests.test_data import good_user
+from tests.data import good_user
 
 from ....constants import ACTIVE_POST_STATUS
 from ....models import Tag, Status, Postable, Post

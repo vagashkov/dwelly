@@ -9,7 +9,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from tests.test_data import create_good_user, good_profile
+from tests.data import good_profile
+from tests.objects import create_good_user
 
 from ..models import Profile
 from ..tests import email
@@ -137,3 +138,13 @@ class ProfileTest(TestCase):
             "profile_photo"
         )
         self.assertNotContains(self.response, "Some wrong text")
+
+    def test_display_reservations_in_profile(self) -> None:
+        """
+        Test display user's reservations on user profile page
+        :return:
+        """
+
+        profile = create_good_user().profile
+        # login using created account credentials
+        self.client.force_login(profile.user)
