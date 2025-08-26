@@ -4,11 +4,9 @@ from shutil import rmtree
 
 from PIL import Image
 
-from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.shortcuts import reverse
 from django.test import override_settings
-from django.utils.text import slugify
 
 from rest_framework.status import (
     HTTP_201_CREATED,
@@ -17,26 +15,13 @@ from rest_framework.status import (
 )
 
 from core.api.tests import BaseAPITest
+from tests.data import good_listing, TEST_DIR
+from tests.objects import create_good_listing
 
 from ...constants import ERROR_KEY
 from ...models import (
-    ObjectType, Category, Amenity, HouseRule,
-    Listing, Photo
+    ObjectType, Category, Amenity, Listing, Photo
 )
-
-TEST_DIR = settings.BASE_DIR / "test_data"
-
-good_listing = {
-            Listing.Field.title: "Test listing",
-            Listing.Field.description: "Test listing description",
-            Listing.Field.max_guests: 2,
-            Listing.Field.bedrooms: 1,
-            Listing.Field.beds: 1,
-            Listing.Field.bathrooms: 1,
-            Listing.Field.check_in_time: "14:00:00",
-            Listing.Field.check_out_time: "12:00:00",
-            Listing.Field.instant_booking: True
-}
 
 
 class BaseListingsAPITest(BaseAPITest):
@@ -75,43 +60,6 @@ class BaseListingsAPITest(BaseAPITest):
 
         cover_photo.save()
 
-    @override_settings(MEDIA_ROOT=TEST_DIR)
-    def create_good_listing(self) -> Listing:
-        apartments = ObjectType.objects.create(name="Apartments")
-
-        essentials = Category.objects.create(name="Essentials")
-        amenities = [
-            Amenity.objects.create(
-                name="Hot water",
-                category=essentials
-            ),
-            Amenity.objects.create(
-                name="Conditioning",
-                category=essentials
-            )
-        ]
-
-        house_rules = [
-            HouseRule.objects.create(name="No smoking"),
-            HouseRule.objects.create(name="Pets allowed")
-        ]
-
-        listing = Listing.objects.create(
-            **good_listing,
-            object_type=apartments,
-            slug=slugify(
-                good_listing.get(
-                    Listing.Field.title
-                )
-            )
-        )
-        listing.amenities.set(amenities)
-        listing.house_rules.set(house_rules)
-        listing.save()
-        self.upload_cover(listing)
-
-        return listing
-
     def tearDown(self) -> None:
         # Cleaning temporary data
         try:
@@ -120,6 +68,7 @@ class BaseListingsAPITest(BaseAPITest):
             pass
 
 
+@override_settings(MEDIA_ROOT=TEST_DIR)
 class ListingsAPITest(BaseListingsAPITest):
     """
     Base class for listings and related entities testing
@@ -370,7 +319,7 @@ class ListingsAPITest(BaseListingsAPITest):
         )
 
     def test_listings_list(self) -> None:
-        listing_object = self.create_good_listing()
+        listing_object = create_good_listing()
 
         # Checking listings list URL and template
         response = self.client.get(reverse("listings:api_list"))
@@ -399,7 +348,7 @@ class ListingsAPITest(BaseListingsAPITest):
         )
 
     def test_listing_details(self) -> None:
-        listing_object: Listing = self.create_good_listing()
+        listing_object = create_good_listing()
 
         # Checking listings list URL and template
         response = self.client.get(

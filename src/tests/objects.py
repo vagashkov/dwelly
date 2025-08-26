@@ -4,17 +4,19 @@ from os.path import exists
 from PIL import Image
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from django.utils.text import slugify
 
 from listings.models import (
     ObjectType, Category, Amenity, HouseRule,
-    Listing, Photo
+    Listing, Photo, PriceTag, Reservation
 )
 from users.models import User
 
 from .data import (
     object_type, category, amenities_list, house_rules_list,
-    good_user, good_listing, TEST_DIR
+    good_user, good_listing, good_price_tag, good_reservation,
+    TEST_DIR
 )
 
 
@@ -30,6 +32,7 @@ def create_good_user() -> User:
     )
 
 
+@override_settings(MEDIA_ROOT=TEST_DIR)
 def upload_cover(listing: Listing) -> None:
     # prepare test image to upload
     image = Image.new(
@@ -108,3 +111,18 @@ def create_good_listing() -> Listing:
     upload_cover(listing)
 
     return listing
+
+
+def create_good_price_tag(listing: Listing) -> PriceTag:
+    return PriceTag.objects.create(
+        listing=listing,
+        **good_price_tag
+    )
+
+
+def create_good_reservation(listing: Listing, user: User) -> Reservation:
+    return Reservation.objects.create(
+        listing=listing,
+        user=user,
+        **good_reservation
+    )

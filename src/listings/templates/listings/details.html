@@ -56,8 +56,8 @@
             <dt class="col-3 d-inline-block">Bedrooms:</dt><dd class="col-9 d-inline-block"> {{ listing.bedrooms }}</dd>
             <dt class="col-3 d-inline-block">Beds:</dt><dd class="col-9 d-inline-block">{{ listing.beds }}</dd>
             <dt class="col-3 d-inline-block">Bathrooms:</dt><dd class="col-9 d-inline-block">{{ listing.bathrooms }}</dd>
-            <dt class="col-3 d-inline-block">Check-in:</dt><dd class="col-9 d-inline-block">{{ listing.check_in_time }}</dd>
-            <dt class="col-3 d-inline-block">Check-out:</dt><dd class="col-9 d-inline-block"> {{ listing.check_out_time }}</dd>
+            <dt class="col-3 d-inline-block">Check-in:</dt><dd class="col-9 d-inline-block">{{ listing.check_in_time|time:"H:i" }}</dd>
+            <dt class="col-3 d-inline-block">Check-out:</dt><dd class="col-9 d-inline-block"> {{ listing.check_out_time|time:"H:i" }}</dd>
             <dt class="col-3 d-inline-block">Instant booking:</dt><dd class="col-9 d-inline-block "> {{ listing.instant_booking }}</dd>
         </dl>
     </section>

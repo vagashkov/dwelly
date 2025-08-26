@@ -3,7 +3,8 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.urls import reverse
 
-from tests.objects import good_user, create_good_user
+from tests.data import good_user
+from tests.objects import create_good_user
 
 User = get_user_model()
 email = good_user.get(User.Field.email)
@@ -17,7 +18,7 @@ class UserTest(TestCase):
 
     def test_create_user_no_email(self) -> None:
         """
-        Test if user user can be created with empty email
+        Test if user can be created with empty email
         :return:
         """
         try:
@@ -63,7 +64,7 @@ class UserTest(TestCase):
 
     def test_create_user_duplicate_email(self) -> None:
         """
-        Check if user user can be created
+        Check if user can be created
         with duplicate email
         :return:
         """

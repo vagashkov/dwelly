@@ -10,6 +10,9 @@ from rest_framework.status import (
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 
+from tests.data import good_reservation
+from tests.objects import create_good_listing
+
 from ....models import Listing, PriceTag, Reservation
 
 from ..constants import (
@@ -18,11 +21,6 @@ from ..constants import (
 from ..tests import BaseListingsAPITest
 
 
-good_reservation = {
-    Reservation.Field.check_in: date.today(),
-    Reservation.Field.check_out: date.today() + relativedelta(weeks=1),
-    Reservation.Field.comment: "Test reservation comment"
-}
 required_fields = [
     Reservation.Field.check_in,
     Reservation.Field.check_out
@@ -39,7 +37,7 @@ class Reservations(BaseListingsAPITest):
 
         :return:
         """
-        self.listing = self.create_good_listing()
+        self.listing = create_good_listing()
 
         PriceTag.objects.create(
             listing=self.listing,

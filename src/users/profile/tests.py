@@ -4,18 +4,18 @@ from shutil import rmtree
 
 from PIL import Image
 
-from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from tests.data import good_profile
-from tests.objects import create_good_user
+from tests.data import good_profile, TEST_DIR
+from tests.objects import (
+    create_good_user, create_good_listing, create_good_price_tag,
+    create_good_reservation
+)
 
 from ..models import Profile
 from ..tests import email
-
-TEST_DIR = settings.BASE_DIR / "test_data"
 
 
 class ProfileTest(TestCase):
@@ -145,6 +145,27 @@ class ProfileTest(TestCase):
         :return:
         """
 
-        profile = create_good_user().profile
+        user = create_good_user()
         # login using created account credentials
-        self.client.force_login(profile.user)
+        self.client.force_login(user)
+
+        listing = create_good_listing()
+        listing.save()
+
+        price_tag = create_good_price_tag(listing)
+        price_tag.save()
+
+        reservation = create_good_reservation(listing, user)
+        reservation.save()
+
+        self.response = self.client.get(
+            reverse("user_display_profile")
+        )
+        self.assertContains(self.response, listing.title)
+        self.assertContains(
+            self.response,
+            "{} - {}".format(
+                reservation.check_in.strftime("%b %d, %Y"),
+                reservation.check_out.strftime("%b %d, %Y")
+            )
+        )

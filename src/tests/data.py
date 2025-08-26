@@ -1,7 +1,10 @@
+from datetime import date
+from dateutil.relativedelta import relativedelta
+
 from django.conf import settings
 
 from core.models import Reference
-from listings.models import Listing
+from listings.models import Listing, PriceTag, Reservation
 from users.models import User, Profile
 
 TEST_DIR = settings.BASE_DIR / "test_data"
@@ -65,5 +68,20 @@ good_listing = {
     Listing.Field.beds: 1,
     Listing.Field.bedrooms: 1,
     Listing.Field.bathrooms: 1,
+    Listing.Field.check_in_time: "14:00",
+    Listing.Field.check_out_time: "12:00",
     Listing.Field.instant_booking: True
+}
+
+good_price_tag = {
+    PriceTag.Field.start_date: date.today(),
+    PriceTag.Field.end_date: date.today() + relativedelta(months=1),
+    PriceTag.Field.price: 100,
+    PriceTag.Field.description: "Test price tag description"
+}
+
+good_reservation = {
+    Reservation.Field.check_in: date.today(),
+    Reservation.Field.check_out: date.today() + relativedelta(weeks=1),
+    Reservation.Field.comment: "Test reservation comment"
 }
