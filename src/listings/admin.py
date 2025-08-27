@@ -184,6 +184,7 @@ class ReservationAdmin(ModelAdmin):
         Reservation.Field.check_in,
         Reservation.Field.check_out,
         Reservation.Field.cost,
+        Reservation.Field.status,
         Reservation.Field.in_progress
     )
 

@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.http import (
-    HttpRequest, HttpResponse, Http404, HttpResponseRedirect
+    HttpRequest, HttpResponse,
+    HttpResponseForbidden, Http404, HttpResponseRedirect
 )
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import View, ListView
 
@@ -9,7 +11,7 @@ from core.models import BaseModel
 
 from .constants import ERROR_MSG_UNKNOWN_LISTING
 from .forms import ReservationForm
-from .models import Listing
+from .models import Listing, Reservation, ReservationStatus
 
 
 class List(ListView):
@@ -97,3 +99,66 @@ class Details(View):
             self.template_name,
             context
         )
+
+
+class UpdateReservation(View):
+    """
+    Performs operations with single reservation object defined by its public ID
+    """
+    ACTION = ""
+
+    def get(self, request: HttpRequest, public_id: str) -> HttpResponse:
+        """
+        Manages operations with selected reservation object
+        :param request:
+        :param public_id:
+        :return:
+        """
+
+        try:
+            reservation = Reservation.objects.get(
+                        id=settings.FF3_CIPHER.decrypt(public_id)
+                )
+        except Reservation.DoesNotExist:
+            raise Http404
+
+        if not reservation.user == self.request.user:
+            return HttpResponseForbidden()
+
+        if self.ACTION == "submit":
+            reservation.status, _ = ReservationStatus.objects.get_or_create(
+                name="Pending"
+            )
+        elif self.ACTION == "approve":
+            reservation.status, _ = ReservationStatus.objects.get_or_create(
+                name="Approved"
+            )
+        elif self.ACTION == "cancel":
+            reservation.status, _ = ReservationStatus.objects.get_or_create(
+                name="Cancelled"
+            )
+
+        reservation.save()
+
+        return redirect("user_display_profile")
+
+
+class SubmitReservation(UpdateReservation):
+    """
+    Performs operations with single reservation object defined by its public ID
+    """
+    ACTION = "submit"
+
+
+class ApproveReservation(UpdateReservation):
+    """
+    Performs operations with single reservation object defined by its public ID
+    """
+    ACTION = "approve"
+
+
+class CancelReservation(UpdateReservation):
+    """
+    Performs operations with single reservation object defined by its public ID
+    """
+    ACTION = "cancel"

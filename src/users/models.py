@@ -86,6 +86,9 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         default=timezone.now
     )
 
+    def get_reservations(self):
+        return self.reservations.all().order_by("-check_in")
+
     def __str__(self) -> str:
         """ Object string representation """
         return "{}".format(self.email)
