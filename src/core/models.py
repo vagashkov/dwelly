@@ -1,11 +1,15 @@
 import uuid
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db.models import (
     Model, BigAutoField, UUIDField,
-    CharField, DateTimeField, BooleanField
+    CharField, DateTimeField, BooleanField,
+    ManyToManyField
 )
 from django.utils.translation import gettext_lazy as _
+
+from .constants import MSG_INITIAL_STATUS_PREDECESSORS
 
 
 class BaseModel(Model):
@@ -81,6 +85,7 @@ class Reference(BaseModel):
     name: str = CharField(
         null=False,
         blank=False,
+        unique=True,
         max_length=64,
         verbose_name=_("Name")
     )
@@ -109,9 +114,38 @@ class BaseStatus(Reference):
         name: str = "name"
         description: str = "description"
         is_initial: str = "is_initial"
+        previous_statuses: str = "previous_statuses"
+        next_statuses: str = "next_statuses"
 
     is_initial: BooleanField = BooleanField(
         null=False,
         blank=True,
         default=False
     )
+
+    previous_statuses = ManyToManyField(
+        "self",
+        blank=True,
+        symmetrical=False,
+        related_name="successors",
+        verbose_name=_("Previous statuses")
+    )
+
+    next_statuses = ManyToManyField(
+        "self",
+        blank=True,
+        symmetrical=False,
+        related_name="predecessors",
+        verbose_name=_("Next statuses")
+    )
+
+    def clean(self):
+        """
+        Some pre-save data validations
+        :return:
+        """
+
+        if self.is_initial and self.previous_statuses.count():
+            raise ValidationError(
+                MSG_INITIAL_STATUS_PREDECESSORS
+            )

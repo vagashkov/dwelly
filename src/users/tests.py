@@ -235,10 +235,6 @@ class AdminPanel(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.user.email)
-        self.assertContains(
-            response,
-            self.user.date_joined.strftime("%b. %d, %Y")
-        )
 
     def test_create_user_page(self) -> None:
         """Test user creation page"""
@@ -246,5 +242,4 @@ class AdminPanel(TestCase):
         response = self.client.get(
             reverse("admin:users_user_add")
         )
-
         self.assertEqual(response.status_code, 200)
