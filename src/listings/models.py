@@ -7,7 +7,8 @@ from django.db.models import (
     QuerySet, CharField, SlugField, TextField,
     BooleanField, PositiveSmallIntegerField,
     DateField, TimeField, ImageField,
-    ForeignKey, PROTECT, CASCADE, ManyToManyField
+    ForeignKey, PROTECT, CASCADE, ManyToManyField,
+    Manager
 )
 from django.urls import reverse
 from django.utils.timezone import now
@@ -491,9 +492,20 @@ class DayRate(BaseModel):
         )
 
 
+class ReservationStatusManager(Manager):
+    """
+    ReservationStatus management fine-tune class
+    """
+
+    def get_by_name(self, name: str) -> "ReservationStatus":
+        return self.get(name=name)
+
+
 class ReservationStatus(BaseStatus):
     class Meta:
         verbose_name_plural = "Reservation statuses"
+
+    objects = ReservationStatusManager()
 
 
 def get_default_reservation_status():

@@ -169,8 +169,25 @@ class ReservationStatusAdmin(ModelAdmin):
     list_display = (
         ReservationStatus.Field.name,
         ReservationStatus.Field.description,
-
+        "predecessor_names",
+        "successor_names"
     )
+
+    def successor_names(self, obj) -> str:
+        return ", ".join(
+            [
+                successor.name for successor in obj.next_statuses.all()
+            ]
+        )
+    successor_names.short_description = "Next status[es]"
+
+    def predecessor_names(self, obj) -> str:
+        return ", ".join(
+            [
+                predecessor.name for predecessor in obj.previous_statuses.all()
+            ]
+        )
+    predecessor_names.short_description = "Previous status[es]"
 
 
 class ReservationAdmin(ModelAdmin):

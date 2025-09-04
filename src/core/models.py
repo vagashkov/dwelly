@@ -101,6 +101,9 @@ class Reference(BaseModel):
     def __str__(self) -> str:
         return "{}".format(self.name)
 
+    def natural_key(self) -> tuple[str]:
+        return (self.name,)
+
 
 class BaseStatus(Reference):
     """

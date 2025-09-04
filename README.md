@@ -10,6 +10,7 @@ Simple yet functional and friendly property management system for family hotel o
 - create Postgres database and fix database credentials in src.config.settings.local-dev.py
 - do not forget to perform database migration and create superuser
 - install Redis or any other message broker you prefer
+- [optionally] load default reservation statuses structure by executing load_reservation_statuses command
 
 ### Launch
 - launch redis using "redis-server" command in console

@@ -1,0 +1,69 @@
+[
+  {
+      "name": "Draft",
+      "description": "The very first status",
+      "is_initial": true,
+      "previous_statuses": [],
+      "next_statuses": [
+        "Pending",
+        "Cancelled"
+      ]
+  },
+  {
+      "name": "Pending",
+      "description": "Waiting for approval",
+      "is_initial": false,
+      "previous_statuses": [
+        "Draft"
+      ],
+      "next_statuses": [
+        "Approved",
+        "Rejected",
+        "Cancelled"
+      ]
+  },
+  {
+      "name": "Approved",
+      "description": "Approved by management",
+      "is_initial": false,
+      "previous_statuses": [
+        "Pending"
+      ],
+      "next_statuses": [
+        "Completed",
+        "Cancelled"
+      ]
+  },
+  {
+      "name": "Rejected",
+      "description": "Rejected by management",
+      "is_initial": false,
+      "previous_statuses": [
+        "Pending"
+      ],
+      "next_statuses": [
+        "Completed",
+        "Pending"
+      ]
+  },
+  {
+      "name": "Completed",
+      "description": "Final status in case of approval",
+      "is_initial": false,
+      "previous_statuses": [
+        "Approved"
+      ],
+      "next_statuses": []
+  },
+  {
+      "name": "Cancelled",
+      "description": "Final status in case of rejection or revocation",
+      "is_initial": false,
+      "previous_statuses": [
+        "Pending",
+        "Rejected",
+        "Approved"
+      ],
+      "next_statuses": []
+  }
+]
