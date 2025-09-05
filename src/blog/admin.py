@@ -1,6 +1,9 @@
 from django.contrib.admin import (
     ModelAdmin, TabularInline, site
 )
+from django.forms import ModelForm
+
+from tinymce.widgets import TinyMCE
 
 from core.models import BaseModel
 from .models import Tag, Status, Postable, Post, Comment
@@ -8,6 +11,24 @@ from .models import Tag, Status, Postable, Post, Comment
 
 class CommentInline(TabularInline):
     model = Comment
+
+
+class PostForm(ModelForm):
+    """
+    Manages new blog post creation
+    """
+
+    class Meta:
+        model = Post
+        fields = "__all__"
+        widgets = {
+            "text": TinyMCE(
+                attrs={
+                    "cols": 80,
+                    "rows": 30
+                }
+            )
+        }
 
 
 class PostAdmin(ModelAdmin):
@@ -19,6 +40,7 @@ class PostAdmin(ModelAdmin):
     list_filter = (
         Post.Field.tags,
     )
+    form = PostForm
     prepopulated_fields = {
         Post.Field.slug: (
             Post.Field.title,

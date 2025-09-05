@@ -31,6 +31,8 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     # Currencies support
     "djmoney",
+    # WYSIWYG editing support
+    "tinymce",
 ]
 PROJECT_APPS = [
     "users.apps.UsersConfig",

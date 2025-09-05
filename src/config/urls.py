@@ -16,6 +16,7 @@ admin.site.site_header = "{} admin panel".format(
 
 urlpatterns = [
     path("admpanel/", admin.site.urls),
+    path("tinymce/", include("tinymce.urls")),
 
     # blog application urls
     path(

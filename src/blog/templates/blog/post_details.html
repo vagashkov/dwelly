@@ -18,7 +18,7 @@
             <img src="{{ post.cover_details }}" alt="{{ post.title }}" class="img-fluid">
         {% endif %}
         <div class="mt-2">
-            {{ post.text|linebreaks }}
+            {{ post.text|safe|linebreaks }}
         </div>
     </main>
     <!-- Enter comment form (for registered users only) -->
