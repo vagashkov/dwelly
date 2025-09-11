@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
@@ -247,6 +248,43 @@ class Listing(BaseModel):
             return self.reservations.order_by(
                 Reservation.Field.check_in
             )
+
+    def get_reservation_by_date(self, selected_date: date) -> "Reservation":
+        """
+        Returns reservation object for designated date (if any)
+        :param selected_date:
+        :return:
+        """
+
+        try:
+            return Reservation.objects.get(
+                listing=self.listing,
+                check_in__lte=selected_date,
+                check_out__gte=selected_date
+            )
+        except Reservation.DoesNotExist:
+            pass
+
+    def is_date_available(self, selected_date: date) -> bool:
+        """
+        Returns if listing is available for reservation for designated date
+        :param selected_date:
+        :return:
+        """
+        return not Reservation.objects.filter(
+            listing=self,
+            check_in__lte=selected_date,
+            check_out__gte=selected_date
+            ).exists()
+
+    def get_availability(
+            self, start_date: date, end_date: date
+    ) -> dict[date, bool]:
+        return {
+            current_date: self.is_date_available(current_date)
+            for current_date
+            in daterange_generator(start_date, end_date)
+        }
 
 
 def upload_path(instance: Listing, filename: str) -> str:

@@ -101,6 +101,16 @@
         </dl>
     </section>
 
+    <!-- Avalable dates -->
+    <section class="row border rounded m-1">
+        <dl>
+            <dt>Avalable dates</dt>
+            <dd>
+                <button hx-get="{% url 'listings:listing_calendar' listing.slug current_month %}">Show calendar</button>
+            </dd>
+        </dl>
+    </section>
+
     <!-- Reservation form -->
     <section class="row border rounded m-1">
         <dl>

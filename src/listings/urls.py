@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from .views import (
-    List, Details,
+    List, Details, Calendar,
     SubmitReservation, ApproveReservation, CancelReservation
 )
 
@@ -26,6 +26,15 @@ urlpatterns = [
         CancelReservation.as_view(),
         name="cancel_reservation"
     ),
-    path("<slug:slug>", Details.as_view(), name="listing_details"),
+    path(
+        "<slug:slug>/calendar/<str:month>",
+        Calendar.as_view(),
+        name="listing_calendar"
+    ),
+    path(
+        "<slug:slug>",
+        Details.as_view(),
+        name="listing_details"
+    ),
     path("", List.as_view(), name="list"),
 ]
