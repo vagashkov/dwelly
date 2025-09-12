@@ -71,6 +71,7 @@ TEMPLATES = [
                 # allauth support
                 "django.template.context_processors.request",
             ],
+            "debug": True,
         },
     },
 ]
