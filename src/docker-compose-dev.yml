@@ -7,6 +7,15 @@ services:
     image: redis:8-bookworm
     restart: always
 
+  redis_insight:
+    container_name: redis_insight
+    image: redis/redisinsight:latest
+    depends_on:
+      - redis
+    ports:
+      - "5540:5540"
+    restart: always
+
   db:
     container_name: db
     image: postgres:14.17-bookworm
