@@ -1,3 +1,5 @@
+from datetime import date
+from dateutil.relativedelta import relativedelta
 from os import mkdir
 from os.path import exists
 from shutil import rmtree
@@ -20,7 +22,8 @@ from tests.objects import create_good_listing
 
 from ...constants import ERROR_KEY
 from ...models import (
-    ObjectType, Category, Amenity, Listing, Photo
+    ObjectType, Category, Amenity, Listing, Photo,
+    PriceTag, Reservation
 )
 
 
@@ -400,4 +403,42 @@ class ListingsAPITest(BaseListingsAPITest):
         self.assertEqual(
             response.data.get("photos")[0].get("details"),
             photo_object.get_details()
+        )
+
+    def test_listing_calendar(self) -> None:
+        user = self.engage_user()
+        listing_object = create_good_listing()
+
+        PriceTag.objects.create(
+            listing=listing_object,
+            start_date=date.today(),
+            end_date=date.today() + relativedelta(weeks=2),
+            price=100
+        ).save()
+
+        reservation = Reservation.objects.create(
+            listing=listing_object,
+            user=user,
+            check_in=date.today(),
+            check_out=date.today() + relativedelta(weeks=1, days=-1),
+        )
+        reservation.save()
+
+        # Checking listings list URL and template
+        response = self.client.get(
+            reverse(
+                "listings:api_listing_calendar",
+                kwargs={
+                    Listing.Field.slug: listing_object.slug,
+                    "month": date.today().strftime("%Y%m")
+                }
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            response.data.get(
+                date.today().strftime("%Y-%m-%d")
+            ),
+            False
         )

@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from .views import Listings, ListingDetails
+from .views import Listings, ListingDetails, Calendar
 
 urlpatterns = [
     # Object types module
@@ -47,6 +47,12 @@ urlpatterns = [
         include(
             "listings.api.v1.reservations.urls"
         )
+    ),
+    # Single listing details
+    path(
+        "<slug:slug>/calendar/<str:month>",
+        Calendar.as_view(),
+        name="api_listing_calendar"
     ),
     # Listing list
     path(

@@ -124,6 +124,11 @@ class ListingAdmin(ModelAdmin):
         ),
     )
 
+    filter_horizontal = (
+        Listing.Field.amenities,
+        Listing.Field.house_rules
+    )
+
 
 class PhotoAdmin(ModelAdmin):
     """
@@ -207,6 +212,9 @@ class ReservationAdmin(ModelAdmin):
 
     list_filter = (
         "listing__title",
+    )
+
+    search_fields = (
         "user__email",
     )
 
