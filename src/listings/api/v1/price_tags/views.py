@@ -12,9 +12,10 @@ from rest_framework.status import (
 
 from ....models import Listing, PriceTag, DayRate
 
-from .constants import (
+from ..constants import (
     ERROR_KEY, ERROR_MSG_UNKNOWN_LISTING
 )
+
 from .permissions import PriceTagPermissions
 from .serializers import PriceTagSerializer, DayRateSerializer
 from .validators import PriceTagValidator
@@ -109,7 +110,6 @@ class DayRatesList(ListAPIView):
     Manages daily rates listing
     """
 
-    order_by = DayRate.Field.date
     serializer_class = DayRateSerializer
 
     def get_queryset(self):
@@ -119,6 +119,8 @@ class DayRatesList(ListAPIView):
             )
             return DayRate.objects.filter(
                 listing=listing
+            ).order_by(
+                DayRate.Field.date
             )
         except Listing.DoesNotExist:
             raise NotFound(

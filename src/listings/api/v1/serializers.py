@@ -1,5 +1,5 @@
 from rest_framework.serializers import (
-    ModelSerializer, SerializerMethodField
+    ModelSerializer, TimeField, SerializerMethodField
 )
 
 from .photos.serializers import PhotoSerializer
@@ -33,6 +33,9 @@ class GetListingDetails(GetListingDigest):
     """
     Manages listing object details serialization
     """
+
+    check_in_time: TimeField = TimeField(format="%H:%M")
+    check_out_time: TimeField = TimeField(format="%H:%M")
 
     photos = SerializerMethodField("get_photos")
 

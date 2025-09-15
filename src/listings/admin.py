@@ -9,7 +9,8 @@ from core.models import Reference
 
 from .models import (
     ObjectType, Category, Amenity, HouseRule,
-    Listing, Photo, PriceTag, DayRate
+    Listing, Photo, PriceTag, DayRate,
+    Reservation, ReservationStatus
 )
 
 APP_NAME = "listings"
@@ -90,6 +91,16 @@ class ListingAdmin(ModelAdmin):
     Simple class for editing listings using admin panel
     """
 
+    def photos_count(self, listing):
+        return listing.photos.count()
+
+    photos_count.short_description = "Photos"
+
+    def reservations_count(self, listing):
+        return listing.reservations.count()
+
+    reservations_count.short_description = "Reservations"
+
     inlines = (
         PhotoInline,
     )
@@ -103,12 +114,19 @@ class ListingAdmin(ModelAdmin):
     list_display = (
         Listing.Field.title,
         Listing.Field.object_type,
+        "photos_count",
+        "reservations_count",
     )
 
     list_filter = (
         "{}__name".format(
             Listing.Field.object_type
         ),
+    )
+
+    filter_horizontal = (
+        Listing.Field.amenities,
+        Listing.Field.house_rules
     )
 
 
@@ -148,6 +166,59 @@ class DailyRateAdmin(ModelAdmin):
     )
 
 
+class ReservationStatusAdmin(ModelAdmin):
+    """
+    Simple class for editing reservation statuses using admin panel
+    """
+
+    list_display = (
+        ReservationStatus.Field.name,
+        ReservationStatus.Field.description,
+        "predecessor_names",
+        "successor_names"
+    )
+
+    def successor_names(self, obj) -> str:
+        return ", ".join(
+            [
+                successor.name for successor in obj.next_statuses.all()
+            ]
+        )
+    successor_names.short_description = "Next status[es]"
+
+    def predecessor_names(self, obj) -> str:
+        return ", ".join(
+            [
+                predecessor.name for predecessor in obj.previous_statuses.all()
+            ]
+        )
+    predecessor_names.short_description = "Previous status[es]"
+
+
+class ReservationAdmin(ModelAdmin):
+    """
+    Simple class for editing reservations using admin panel
+    """
+
+    list_display = (
+        Reservation.Field.listing,
+        Reservation.Field.user,
+        Reservation.Field.check_in,
+        Reservation.Field.check_out,
+        Reservation.Field.cost,
+        Reservation.Field.status,
+        Reservation.Field.in_progress
+    )
+
+    list_filter = (
+        "listing__title",
+    )
+
+    search_fields = (
+        "user__email",
+    )
+
+
 site.register(ObjectType, ObjectTypeAdmin)
 site.register(Category, CategoryAdmin)
 site.register(Amenity, AmenityAdmin)
@@ -156,3 +227,5 @@ site.register(Listing, ListingAdmin)
 site.register(Photo, PhotoAdmin)
 site.register(PriceTag, PriceTagAdmin)
 site.register(DayRate, DailyRateAdmin)
+site.register(Reservation, ReservationAdmin)
+site.register(ReservationStatus, ReservationStatusAdmin)

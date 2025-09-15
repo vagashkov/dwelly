@@ -1,10 +1,9 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from .models import (
-    PriceTag, DayRate,
-    daterange_generator
-)
+from core.utils.dates import daterange_generator
+
+from .models import PriceTag, DayRate
 
 
 @receiver(post_save, sender=PriceTag)

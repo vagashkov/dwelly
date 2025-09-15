@@ -9,6 +9,7 @@ click==8.2.1
 click-didyoumean==0.3.1
 click-plugins==1.1.1.2
 click-repl==0.3.0
+coverage==7.10.6
 crispy-bootstrap5==2025.6
 dj-rest-auth==7.0.1
 Django==5.2.4
@@ -16,6 +17,8 @@ django-allauth==65.9.0
 django-crispy-forms==2.4
 django-money==3.5.4
 django-phonenumber-field==8.1.0
+django-tinymce==4.1.0
+django_coverage_plugin==3.1.1
 djangorestframework==3.16.0
 drf-spectacular==0.28.0
 environs==14.2.0
@@ -42,11 +45,12 @@ pyflakes==3.4.0
 pyngo==2.4.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
+pytz==2025.2
 PyYAML==6.0.2
 redis==6.2.0
 referencing==0.36.2
 rpds-py==0.26.0
-setuptools==65.5.1
+setuptools==80.9.0
 six==1.17.0
 sqlparse==0.5.3
 typing-inspection==0.4.1

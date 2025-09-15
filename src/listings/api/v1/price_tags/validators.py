@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, field_validator
 
-from ....models import PriceTag
+from ..constants import ERROR_MSG_WRONG_DATE_FORMAT
 
-from .constants import ERROR_MSG_WRONG_DATE_FORMAT
+from ....models import PriceTag
 
 
 class PriceTagValidator(BaseModel):

@@ -1,6 +1,7 @@
 from django.contrib.admin import site, StackedInline
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import gettext_lazy as _
 
 from .models import Profile
 
@@ -39,10 +40,14 @@ class UsersAdmin(UserAdmin):
         (
             None,
             {
+                "classes": ("wide",),
                 "fields": (
                     User.Field.email,
                     "{}1".format(User.Field.password),
                     "{}2".format(User.Field.password),
+                    User.Field.is_active,
+                    User.Field.is_staff,
+                    User.Field.is_superuser
                 ),
                 }
         ),
@@ -56,16 +61,14 @@ class UsersAdmin(UserAdmin):
             {
                 "fields": (
                     User.Field.email,
-                    User.Field.date_joined,
                     User.Field.password,
-                    User.Field.last_login
                 )
             }
         ),
 
         # Groups and permission section
         (
-            "Details",
+            _("Details"),
             {
                 "fields": (
                     User.Field.is_active,
@@ -76,7 +79,22 @@ class UsersAdmin(UserAdmin):
                 )
             }
         ),
+
+        (
+            _("History"),
+            {
+                "fields": (
+                    User.Field.date_joined,
+                    User.Field.last_login
+                )
+            }
+        ),
     )
+
+    readonly_fields = [
+        User.Field.date_joined,
+        User.Field.last_login
+    ]
 
 
 site.register(User, UsersAdmin)

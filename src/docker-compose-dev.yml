@@ -7,6 +7,15 @@ services:
     image: redis:8-bookworm
     restart: always
 
+  redis_insight:
+    container_name: redis_insight
+    image: redis/redisinsight:latest
+    depends_on:
+      - redis
+    ports:
+      - "5540:5540"
+    restart: always
+
   db:
     container_name: db
     image: postgres:14.17-bookworm
@@ -41,7 +50,8 @@ services:
       - redis
       - db
     command: >
-      python manage.py runserver 0.0.0.0:8000
+      sh -c "python manage.py wait_for_db && 
+             python manage.py runserver 0.0.0.0:8000"
 
 volumes:
   postgres_data:

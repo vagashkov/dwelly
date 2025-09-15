@@ -1,7 +1,6 @@
 import io
 from PIL import Image
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
 
@@ -17,15 +16,13 @@ from rest_framework.status import (
 )
 from rest_framework.test import override_settings
 
-from tests.test_data import good_user
+from tests.data import good_user, TEST_DIR
 
 from ....constants import ACTIVE_POST_STATUS
 from ....models import Tag, Status, Postable, Post
 from ....tests import BaseTest
 
 User = get_user_model()
-
-TEST_DIR = settings.BASE_DIR / "test_data"
 
 email = good_user.get(User.Field.email)
 password = good_user.get(User.Field.password)

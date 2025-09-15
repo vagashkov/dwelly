@@ -12,7 +12,7 @@ from rest_framework.status import (
 )
 from rest_framework.test import APITestCase
 
-from tests.test_data import good_user, good_profile
+from tests.data import good_user, good_profile
 
 from ...constants import (
     ERROR_MSG_DUPLICATE_MAIL,

@@ -1,25 +1,33 @@
-from datetime import date, timedelta
+from datetime import date
+from decimal import Decimal
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db.models import (
-    CharField, SlugField, TextField,
+    QuerySet, CharField, SlugField, TextField,
     BooleanField, PositiveSmallIntegerField,
-    DateField, TimeField, ImageField, QuerySet,
-    ForeignKey, PROTECT, CASCADE, ManyToManyField
+    DateField, TimeField, ImageField,
+    ForeignKey, PROTECT, CASCADE, ManyToManyField,
+    Manager
 )
 from django.urls import reverse
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
+from djmoney.money import Money
 from djmoney.models.fields import MoneyField
 
-from core.models import BaseModel, Reference
+from core.models import BaseModel, Reference, BaseStatus
+from core.utils.dates import daterange_generator
 from core.utils.images import convert_image, create_thumbnails
 
 from .constants import (
     ERROR_MSG_NEGATIVE_DAY_RATE,
     ERROR_MSG_OVERLAPPING_DATES
 )
+
+User = get_user_model()
 
 APP_NAME = "listings"
 
@@ -212,7 +220,7 @@ class Listing(BaseModel):
         )
 
     def get_absolute_url(self) -> str:
-        return reverse("listings:details", args=[self.slug])
+        return reverse("listings:listing_details", args=[self.slug])
 
     def get_cover_photo(self) -> "Photo":
         if self.photos:
@@ -234,6 +242,49 @@ class Listing(BaseModel):
             return self.price_tags.order_by(
                 PriceTag.Field.start_date
             )
+
+    def get_reservations(self) -> "QuerySet[Reservation]":
+        if self.reservations:
+            return self.reservations.order_by(
+                Reservation.Field.check_in
+            )
+
+    def get_reservation_by_date(self, selected_date: date) -> "Reservation":
+        """
+        Returns reservation object for designated date (if any)
+        :param selected_date:
+        :return:
+        """
+
+        try:
+            return Reservation.objects.get(
+                listing=self.listing,
+                check_in__lte=selected_date,
+                check_out__gte=selected_date
+            )
+        except Reservation.DoesNotExist:
+            pass
+
+    def is_date_available(self, selected_date: date) -> bool:
+        """
+        Returns if listing is available for reservation for designated date
+        :param selected_date:
+        :return:
+        """
+        return not Reservation.objects.filter(
+            listing=self,
+            check_in__lte=selected_date,
+            check_out__gte=selected_date
+            ).exists()
+
+    def get_availability(
+            self, start_date: date, end_date: date
+    ) -> dict[date, bool]:
+        return {
+            current_date: self.is_date_available(current_date)
+            for current_date
+            in daterange_generator(start_date, end_date)
+        }
 
 
 def upload_path(instance: Listing, filename: str) -> str:
@@ -335,16 +386,6 @@ class Photo(BaseModel):
             str(settings.IMAGE_SIZE_MEDIUM[1]),
             settings.IMAGE_FORMAT
         )
-
-
-def daterange_generator(start_date: date, end_date: date):
-    """Generates dates between start_date and end_date (inclusive)."""
-    for counter in range(
-            int(
-                (end_date - start_date).days
-            ) + 1
-    ):
-        yield start_date + timedelta(counter)
 
 
 class PriceTag(BaseModel):
@@ -486,4 +527,152 @@ class DayRate(BaseModel):
             self.listing.title,
             self.date.strftime("%b %d, %Y"),
             self.price
+        )
+
+
+class ReservationStatusManager(Manager):
+    """
+    ReservationStatus management fine-tune class
+    """
+
+    def get_by_name(self, name: str) -> "ReservationStatus":
+        return self.get(name=name)
+
+
+class ReservationStatus(BaseStatus):
+    class Meta:
+        verbose_name_plural = "Reservation statuses"
+
+    objects = ReservationStatusManager()
+
+
+def get_default_reservation_status():
+    default_status, _ = ReservationStatus.objects.get_or_create(
+        name="Draft",
+        is_initial=True
+    )
+    return default_status.id
+
+
+class Reservation(BaseModel):
+    """
+    Class for listing reservations made by users
+    """
+
+    class Field:
+        user: str = "user"
+        listing: str = "listing"
+        check_in: str = "check_in"
+        check_out: str = "check_out"
+        in_progress: str = "in_progress"
+        comment: str = "comment"
+        cost: str = "cost"
+        currency: str = "currency"
+        status: str = "status"
+
+    user: ForeignKey = ForeignKey(
+        User,
+        null=False,
+        related_name="reservations",
+        verbose_name=_("User"),
+        on_delete=CASCADE
+    )
+
+    listing: ForeignKey = ForeignKey(
+        Listing,
+        null=False,
+        verbose_name=_("Listing"),
+        related_name="reservations",
+        on_delete=CASCADE
+    )
+
+    check_in: DateField = DateField(
+        null=False,
+        blank=False,
+        verbose_name=_("Check-in")
+    )
+
+    check_out: DateField = DateField(
+        null=False,
+        blank=False,
+        verbose_name=_("Check-out")
+    )
+
+    comment: TextField = TextField(
+        null=False,
+        blank=True,
+        default="",
+        verbose_name=_("Comment")
+    )
+
+    status: ForeignKey = ForeignKey(
+        ReservationStatus,
+        null=False,
+        blank=False,
+        default=get_default_reservation_status,
+        related_name="listings",
+        on_delete=PROTECT,
+        verbose_name=_("Status")
+    )
+
+    def clean(self):
+        overlapping_dates = list()
+
+        # First we have to look for potential conflicts
+        for current_date in daterange_generator(
+                self.check_in, self.check_out
+        ):
+            try:
+                reservation = Reservation.objects.get(
+                    listing=self.listing,
+                    check_in__lte=current_date,
+                    check_out__gte=current_date
+                )
+            except Reservation.DoesNotExist:
+                pass
+            else:
+                if reservation != self:
+                    overlapping_dates.append(
+                        current_date.strftime("%Y-%m-%d")
+                        )
+
+        if overlapping_dates:
+            raise ValidationError(
+                ERROR_MSG_OVERLAPPING_DATES.format(
+                    ", ".join(overlapping_dates)
+                )
+            )
+
+    def __str__(self):
+        return "{} {}-{}".format(
+            self.listing.title,
+            self.check_in,
+            self.check_out
+        )
+
+    def in_progress(self):
+        return self.check_in < now().date() < self.check_out
+
+    in_progress.boolean = True
+
+    @property
+    def cost(self):
+        total_cost = Decimal(0.0)
+
+        # First we have to look for potential conflicts
+        for current_date in daterange_generator(
+                self.check_in, self.check_out
+        ):
+            try:
+                day_rate = DayRate.objects.get(
+                    listing=self.listing,
+                    date=current_date
+                )
+            except Reservation.DoesNotExist:
+                pass
+            else:
+                total_cost += day_rate.price.amount
+
+        return Money(
+            total_cost, settings.BASE_CURRENCY
         )

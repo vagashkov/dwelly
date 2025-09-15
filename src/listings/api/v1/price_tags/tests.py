@@ -9,18 +9,15 @@ from rest_framework.status import (
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 
+from tests.data import good_price_tag
+from tests.objects import create_good_listing
+
 from ....models import Listing, PriceTag, DayRate
-from ..tests import BaseListingsAPITest
-from .constants import (
+
+from ..constants import (
     ERROR_KEY, ERROR_MSG_UNKNOWN_LISTING
 )
-
-good_price_tag = {
-    PriceTag.Field.start_date: date.today(),
-    PriceTag.Field.end_date: date.today() + relativedelta(months=1),
-    PriceTag.Field.price: 100,
-    PriceTag.Field.description: "Test price tag description"
-}
+from ..tests import BaseListingsAPITest
 
 
 class PriceTags(BaseListingsAPITest):
@@ -33,7 +30,7 @@ class PriceTags(BaseListingsAPITest):
 
         :return:
         """
-        self.good_listing_object = self.create_good_listing()
+        self.good_listing_object = create_good_listing()
 
     def test_create_price_tag_no_auth(self) -> None:
         # Create new listing price tag without authentication

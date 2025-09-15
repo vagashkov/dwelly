@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.urls import reverse
 
-from tests.test_data import good_user, create_good_user
+from tests.data import good_user
+from tests.objects import create_good_user
 
 User = get_user_model()
 email = good_user.get(User.Field.email)
@@ -17,7 +18,7 @@ class UserTest(TestCase):
 
     def test_create_user_no_email(self) -> None:
         """
-        Test if user user can be created with empty email
+        Test if user can be created with empty email
         :return:
         """
         try:
@@ -63,7 +64,7 @@ class UserTest(TestCase):
 
     def test_create_user_duplicate_email(self) -> None:
         """
-        Check if user user can be created
+        Check if user can be created
         with duplicate email
         :return:
         """
@@ -192,3 +193,53 @@ class LoginPage(TestCase):
             self.response.headers.get("Location"),
             reverse("home")
         )
+
+
+class AdminPanel(TestCase):
+    """
+    Tests for Django admin panel modifications
+    """
+
+    def setUp(self) -> None:
+        """ Create superuser and client onjects """
+        self.client = Client()
+
+        self.admin = User.objects.create_superuser(
+            email="admin_{}".format(email),
+            password=password
+            )
+
+        self.client.force_login(self.admin)
+
+        self.user = User.objects.create_user(
+            email=email,
+            password=password
+            )
+
+    def test_users_list(self) -> None:
+        """Test user list page"""
+
+        response = self.client.get(
+            reverse("admin:users_user_changelist")
+        )
+
+        self.assertContains(response, self.admin.email)
+        self.assertContains(response, self.user.email)
+
+    def test_edit_user_page(self) -> None:
+        """Test user editing page"""
+
+        response = self.client.get(
+            reverse("admin:users_user_change", args=[self.user.id])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.user.email)
+
+    def test_create_user_page(self) -> None:
+        """Test user creation page"""
+
+        response = self.client.get(
+            reverse("admin:users_user_add")
+        )
+        self.assertEqual(response.status_code, 200)

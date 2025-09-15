@@ -56,8 +56,8 @@
             <dt class="col-3 d-inline-block">Bedrooms:</dt><dd class="col-9 d-inline-block"> {{ listing.bedrooms }}</dd>
             <dt class="col-3 d-inline-block">Beds:</dt><dd class="col-9 d-inline-block">{{ listing.beds }}</dd>
             <dt class="col-3 d-inline-block">Bathrooms:</dt><dd class="col-9 d-inline-block">{{ listing.bathrooms }}</dd>
-            <dt class="col-3 d-inline-block">Check-in:</dt><dd class="col-9 d-inline-block">{{ listing.check_in_time }}</dd>
-            <dt class="col-3 d-inline-block">Check-out:</dt><dd class="col-9 d-inline-block"> {{ listing.check_out_time }}</dd>
+            <dt class="col-3 d-inline-block">Check-in:</dt><dd class="col-9 d-inline-block">{{ listing.check_in_time|time:"H:i" }}</dd>
+            <dt class="col-3 d-inline-block">Check-out:</dt><dd class="col-9 d-inline-block"> {{ listing.check_out_time|time:"H:i" }}</dd>
             <dt class="col-3 d-inline-block">Instant booking:</dt><dd class="col-9 d-inline-block "> {{ listing.instant_booking }}</dd>
         </dl>
     </section>
@@ -97,6 +97,30 @@
                         <li class="list-group-item"> {{ price_tag.start_date|date:"M d, Y" }} - {{ price_tag.end_date|date:"M d, Y" }}: {{ price_tag.price }} </li>
                     {% endfor %}
                 </ul>
+            </dd>
+        </dl>
+    </section>
+
+    <!-- Avalable dates -->
+    <section class="row border rounded m-1">
+        <dl>
+            <dt>Avalable dates</dt>
+            <dd>
+                <button hx-get="{% url 'listings:listing_calendar' listing.slug current_month %}">Show calendar</button>
+            </dd>
+        </dl>
+    </section>
+
+    <!-- Reservation form -->
+    <section class="row border rounded m-1">
+        <dl>
+            <dt>Reservation:</dt>
+            <dd>
+                {% if user.is_authenticated %}
+                    {% include "listings/includes/reservation_form.html" %}
+                {% else %}
+                    <p>Please <a href="{% url 'account_login' %}">log in</a> or <a href="{% url 'account_signup' %}">register</a> to view available dates and submit for reservation </p>
+                {% endif %}
             </dd>
         </dl>
     </section>

@@ -86,6 +86,9 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         default=timezone.now
     )
 
+    def get_reservations(self):
+        return self.reservations.all().order_by("-check_in")
+
     def __str__(self) -> str:
         """ Object string representation """
         return "{}".format(self.email)
@@ -115,6 +118,7 @@ class Profile(BaseModel):
         phone: str = "phone"
         bio: str = "bio"
         photo: str = "photo"
+        reservations_count: str = "reservations_count"
 
     user: OneToOneField = OneToOneField(
         User,
@@ -198,3 +202,8 @@ class Profile(BaseModel):
                     *AVATAR_DIMENSIONS.get(size),
                     settings.IMAGE_FORMAT
                 )
+
+    def reservations_count(self):
+        return self.user.reservations.count()
+
+    reservations_count.short_description = "Reservations"

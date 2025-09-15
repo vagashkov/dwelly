@@ -1,0 +1,38 @@
+<style>
+    /* Custom styles for calendar table if needed */
+    .table-calendar {
+        width: 100%;
+        text-align: center;
+    }
+    .table-calendar th, .table-calendar td {
+        padding: 0.75rem;
+        border: 1px solid #dee2e6; /* Bootstrap's default table border color */
+    }
+    .table-calendar thead th {
+        background-color: #f8f9fa; /* Light gray background for header */
+    }
+    .table-calendar .month {
+        font-weight: bold;
+        font-size: 1.25rem;
+    }
+    .table-calendar .day {
+        color: #6c757d; /* Muted color for day names */
+    }
+    .table-calendar .free {
+        background-color: mintcream;
+    }
+    .table-calendar .busy {
+        background-color: mistyrose; /* Highlight for busy days */
+    }
+</style>
+
+<div class="container mt-2">
+    <h4 class="mb-2">Calendar</h4>
+    <!-- Python generated HTML calendar will be inserted here -->
+    <div class="d-inline-block w-40">
+        {{ current_calendar|safe }}
+    </div>
+    <div class="d-inline-block w-40">
+        {{ next_calendar|safe }}
+    </div>
+</div>

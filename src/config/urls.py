@@ -10,8 +10,13 @@ from django.urls import path, include
 
 from core.views import HomeView
 
+admin.site.site_header = "{} admin panel".format(
+    settings.PROJECT_NAME
+)
+
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("admpanel/", admin.site.urls),
+    path("tinymce/", include("tinymce.urls")),
 
     # blog application urls
     path(

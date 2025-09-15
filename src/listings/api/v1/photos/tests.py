@@ -10,9 +10,12 @@ from rest_framework.status import (
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 
-from ..tests import BaseListingsAPITest, TEST_DIR
+from tests.data import TEST_DIR
+from tests.objects import create_good_listing
 
 from ....models import Listing, Photo
+
+from ..tests import BaseListingsAPITest
 
 from .constants import (
     ERROR_KEY, ERROR_MSG_NO_PHOTO_ATTACHED,
@@ -51,7 +54,7 @@ class Photos(BaseListingsAPITest):
 
         :return:
         """
-        self.good_listing_object = self.create_good_listing()
+        self.good_listing_object = create_good_listing()
 
     def test_create_photo_no_auth(self) -> None:
 

@@ -12,6 +12,6 @@
             <h2 class="card-title h4">{{ listing.title }}</h2>
         </a>
         <p class="card-text mt-4">{{ listing.object_type.name }}</p>
-        <a href="{{ post.get_absolute_url }}" class="link-secondary">Read more...</a>
+        <a href="{{ listing.get_absolute_url }}" class="link-secondary">Read more...</a>
     </div>
 </div>

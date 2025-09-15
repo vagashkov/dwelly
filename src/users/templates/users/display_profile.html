@@ -31,5 +31,33 @@
             </div>
         </div>
     </div>
+    <!-- Reservations -->
+    <div class="d-flex align-items-center mb-3">
+        <h5>My reservations</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table small">
+            <thead>
+            <tr>
+                <th scope="col">Room</th>
+                <th scope="col">Dates</th>
+                <th scope="col">Cost</th>
+                <th scope="col">Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for reservation in profile.user.get_reservations %}
+            <tr class="bg-blue">
+                <td class="pt-2">{{ reservation.listing.title }}</td>
+                <td class="pt-2">{{ reservation.check_in|date:"M d, Y" }} - {{ reservation.check_out|date:"M d, Y"}}</td>
+                <td class="pt-2">{{ reservation.status.name }}</td>
+                <td class="pt-2">{{ reservation.cost.amount|floatformat:2 }} {{ reservation.cost.currency }}</td>
+                <td class="pt-2"><a href="{% url 'listings:submit_reservation' reservation.public_id %}">Submit</a></td>
+                <td class="pt-2"><a href="{% url 'listings:cancel_reservation' reservation.public_id %}">Cancel</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </main>
 {% endblock content %}
