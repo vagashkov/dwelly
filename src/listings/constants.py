@@ -16,3 +16,6 @@ ERROR_MSG_JSON_DECODING = _("JSON decode error: {}")
 INFO_MSG_RESERVATION_STATUSES_LOADED = _(
     "Reservation statuses data loaded successfully"
 )
+INFO_MSG_AMENITIES_LOADED = _(
+    "Amenities data loaded successfully"
+)

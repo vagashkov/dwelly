@@ -1,0 +1,46 @@
+[
+  {
+      "name": "Basic",
+      "description": "The very essentials",
+      "amenities": [
+        {
+          "name": "Cold water",
+          "description": "The base of life itself"
+        },
+        {
+          "name": "Hot water",
+          "description": "Taking shower etc."
+        },
+        {
+          "name": "Plumbing",
+          "description": "The great invention"
+        },
+        {
+          "name": "Electricity",
+          "description": "To bring light and internet"
+        }
+      ]
+  },
+  {
+      "name": "Add-ons",
+      "description": "Other conveniences",
+      "amenities": [
+        {
+          "name": "Air conditioning",
+          "description": "For really hot days"
+        },
+        {
+          "name": "Central heating",
+          "description": "For really cold days"
+        },
+        {
+          "name": "Kitchen",
+          "description": "Prepare food without going out"
+        },
+        {
+          "name": "Wi-Fi",
+          "description": "To stay connected"
+        }
+      ]
+    }
+]
