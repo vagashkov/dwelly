@@ -27,6 +27,15 @@ urlpatterns = [
         ),
     ),
 
+    # contacts application urls
+    path(
+        "contacts/",
+        include(
+            "contacts.urls",
+            namespace="contacts"
+        ),
+    ),
+
     # listings application urls
     path(
         "listings/",

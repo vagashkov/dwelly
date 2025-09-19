@@ -33,12 +33,15 @@ THIRD_PARTY_APPS = [
     "djmoney",
     # WYSIWYG editing support
     "tinymce",
+    # Custom model fields support
+    "django_countries"
 ]
 PROJECT_APPS = [
     "users.apps.UsersConfig",
     "blog.apps.BlogConfig",
     "core.apps.CoreConfig",
-    "listings.apps.ListingsConfig"
+    "listings.apps.ListingsConfig",
+    "contacts.apps.ContactsConfig",
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 

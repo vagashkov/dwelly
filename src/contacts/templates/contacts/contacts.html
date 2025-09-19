@@ -1,0 +1,26 @@
+{% extends "_base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block css_files %}
+{% endblock %}
+{% block title %}Contacts{% endblock title %}
+{% block content %}
+    <!-- Company info -->
+    <main class="container bg-light text-dark border rounded-4 shadow-sm">
+        <h2>{{ company.short_name }}</h2>
+        <div class="mt-2">
+            {{ company.description|safe|linebreaks }}
+        </div>
+
+        <!-- Legal data -->
+        <section class="row border rounded-3 m-1">
+        <dl>
+            <dt class="col-3 d-inline-block">Full name:</dt><dd class="col-9 d-inline-block">{{ company.full_name }}</dd>
+            <dt class="col-3 d-inline-block">Registration:</dt><dd class="col-9 d-inline-block">{{ company.registration }}</dd>
+            <dt class="col-3 d-inline-block">License:</dt><dd class="col-9 d-inline-block">{{ company.license }}</dd>
+        </dl>
+        </section>
+    </main>
+
+
+{% endblock content %}
