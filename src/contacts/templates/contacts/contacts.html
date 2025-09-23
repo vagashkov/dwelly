@@ -15,12 +15,34 @@
         <!-- Legal data -->
         <section class="row border rounded-3 m-1">
         <dl>
-            <dt class="col-3 d-inline-block">Full name:</dt><dd class="col-9 d-inline-block">{{ company.full_name }}</dd>
-            <dt class="col-3 d-inline-block">Registration:</dt><dd class="col-9 d-inline-block">{{ company.registration }}</dd>
-            <dt class="col-3 d-inline-block">License:</dt><dd class="col-9 d-inline-block">{{ company.license }}</dd>
+            <dt class="col-3 d-inline-block">Full name:</dt>
+            <dd class="col-9 d-inline-block">{{ company.full_name }}</dd>
+            <dt class="col-3 d-inline-block">Registration:</dt>
+            <dd class="col-9 d-inline-block">{{ company.registration }}</dd>
+            <dt class="col-3 d-inline-block">License:</dt>
+            <dd class="col-9 d-inline-block">{{ company.license }}</dd>
         </dl>
         </section>
+
+        <!-- Addresses -->
+        <section class="row border rounded-3 m-1">
+            {% for address in company.addresses.all %}
+            <dl>
+            <dt class="col-3 d-inline-block">Address(-es):</dt>
+                <dd class="col-9 d-inline-block">{{ address }}</dd>
+            </dl>
+            {% endfor %}
+        </section>
+
+
+        <!-- Contacts -->
+        <section class="row border rounded-3 m-1">
+            {% for contact in company.contacts.all %}
+            <dl>
+            <dt class="col-3 d-inline-block">{{ contact.contact_type.name}} :</dt>
+                <dd class="col-9 d-inline-block">{{ contact.value }}</dd>
+            </dl>
+            {% endfor %}
+        </section>
     </main>
-
-
 {% endblock content %}

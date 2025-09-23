@@ -1,11 +1,11 @@
 from django.db.models import (
-    CharField, ForeignKey, CASCADE
+    CharField, ForeignKey, CASCADE, PROTECT
 )
 from django.utils.translation import gettext_lazy as _
 
 from django_countries.fields import CountryField
 
-from core.models import BaseModel
+from core.models import BaseModel, BaseContact, Reference
 
 
 class Company(BaseModel):
@@ -54,6 +54,12 @@ class Company(BaseModel):
         verbose_name=_("Registration")
     )
 
+    def __str__(self) -> str:
+        return "{} ({})".format(
+            self.full_name,
+            self.short_name
+        )
+
 
 class CompanyAddress(BaseModel):
     """
@@ -70,7 +76,7 @@ class CompanyAddress(BaseModel):
         city: str = "city"
         street_address: str = "street_address"
         zip_code: str = "zip_code"
-        description: str = "descripotion"
+        description: str = "description"
 
     company: ForeignKey = ForeignKey(
         Company,
@@ -114,3 +120,39 @@ class CompanyAddress(BaseModel):
             self.city,
             self.country
         )
+
+
+class ContactType(Reference):
+    """
+    Manages storing different contact info types
+    (email, phone, WhatsApp, Telegram etc.)
+    """
+
+    class Meta:
+        verbose_name_plural = "Contact types"
+
+
+class CompanyContact(BaseContact):
+    """
+    Manages storing company contacts (email, Telegram, WhatsApp etc).
+    """
+
+    class Meta:
+        verbose_name_plural = "Contacts"
+
+    contact_type: ForeignKey = ForeignKey(
+        ContactType,
+        null=False,
+        blank=False,
+        on_delete=PROTECT,
+        verbose_name=_("Contact type")
+    )
+
+    company: ForeignKey = ForeignKey(
+        Company,
+        null=False,
+        blank=False,
+        on_delete=CASCADE,
+        related_name="contacts",
+        verbose_name=_("Company")
+    )

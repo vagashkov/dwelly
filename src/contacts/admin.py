@@ -1,6 +1,9 @@
 from django.contrib.admin import ModelAdmin, site
 
-from .models import Company, CompanyAddress
+from .models import (
+    Company, CompanyAddress,
+    ContactType, CompanyContact
+)
 
 
 class CompanyAdmin(ModelAdmin):
@@ -14,4 +17,6 @@ class CompanyAdmin(ModelAdmin):
 
 
 site.register(Company, CompanyAdmin)
+site.register(ContactType)
+site.register(CompanyContact)
 site.register(CompanyAddress)
