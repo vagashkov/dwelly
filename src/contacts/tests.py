@@ -52,7 +52,7 @@ class ContactsTest(TestCase):
                 company=company
             )
 
-    def test_posts_list(self) -> None:
+    def test_company_info(self) -> None:
         response = self.client.get(reverse("contacts:company_info"))
 
         self.assertEqual(response.status_code, 200)
@@ -64,3 +64,9 @@ class ContactsTest(TestCase):
         for contact_type, contact_value in company_contacts.items():
             self.assertContains(response, contact_type)
             self.assertContains(response, contact_value)
+
+        # Checking user contact form
+        self.assertContains(response, "Your name:")
+        self.assertContains(response, "Contact type:")
+        self.assertContains(response, "Your contact:")
+        self.assertContains(response, "Text:")

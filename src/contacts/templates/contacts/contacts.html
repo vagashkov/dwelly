@@ -45,4 +45,13 @@
             {% endfor %}
         </section>
     </main>
+    <br>
+    <section id="contact-form" class="container bg-light text-dark border rounded-4 form-outline w-50">
+        <h3>Contact form:</h3>
+        <form action="{% url 'contacts:company_info' %}" method="POST">
+            {% csrf_token %}
+            {{ contact_form | crispy }}
+            <button class="btn btn-secondary btn-sm mb-2">Submit </button>
+        </form>
+    </section>
 {% endblock content %}

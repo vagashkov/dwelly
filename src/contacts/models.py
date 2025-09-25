@@ -1,5 +1,6 @@
 from django.db.models import (
-    CharField, ForeignKey, CASCADE, PROTECT
+    CharField, TextField, BooleanField,
+    ForeignKey, CASCADE, PROTECT
 )
 from django.utils.translation import gettext_lazy as _
 
@@ -156,3 +157,60 @@ class CompanyContact(BaseContact):
         related_name="contacts",
         verbose_name=_("Company")
     )
+
+
+class Contact(BaseModel):
+    """
+    Class for contact form messages
+    """
+
+    class Meta:
+        verbose_name_plural = _("User messages")
+
+    class Field:
+        author: str = "author"
+        contact_type: str = "contact_type"
+        contact: str = "contact"
+        text: str = "text"
+        is_processed: str = "is_processed"
+
+    author: CharField = CharField(
+        null=False,
+        blank=False,
+        max_length=64,
+        verbose_name=_("Author")
+    )
+
+    contact_type: ForeignKey = ForeignKey(
+        ContactType,
+        null=False,
+        blank=False,
+        on_delete=PROTECT,
+        verbose_name=_("Contact type")
+    )
+
+    contact: CharField = CharField(
+        null=False,
+        blank=False,
+        max_length=256,
+        verbose_name=_("Contact")
+    )
+
+    text: TextField = TextField(
+        null=False,
+        blank=False,
+        verbose_name=_("Text")
+    )
+
+    is_processed: BooleanField = BooleanField(
+        null=False,
+        blank=True,
+        default=False,
+        verbose_name=_("Processed")
+    )
+
+    def __str__(self) -> str:
+        return "{} on {}".format(
+            self.author,
+            self.created_at
+        )
