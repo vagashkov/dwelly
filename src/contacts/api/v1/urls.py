@@ -1,8 +1,11 @@
-from django.urls import path, include
+from django.urls import path
+
+from .views import CreateCompany
 
 urlpatterns = [
     path(
-        "v1/",
-        include("blog.api.v1.urls")
+        "",
+        CreateCompany.as_view(),
+        name="api_company"
     )
 ]

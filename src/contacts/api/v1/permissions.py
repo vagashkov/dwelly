@@ -1,9 +1,9 @@
 from core.api.reference.permissions import ReferencePermissions
 
 
-class PostPermissions(ReferencePermissions):
+class CompanyPermissions(ReferencePermissions):
     """
-    Defines access for Post objects
+    Defines access for Company objects
     """
 
     pass
