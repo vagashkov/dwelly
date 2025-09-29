@@ -13,7 +13,10 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 
-from ...constants import ERROR_KEY, ERROR_NO_COMPANY_FULL_NAME
+from ...constants import (
+    ERROR_KEY, ERROR_NO_COMPANY_FULL_NAME,
+    ERROR_COMPANY_ALREADY_EXISTS
+)
 from ...models import Company
 
 from .permissions import CompanyPermissions
@@ -36,6 +39,14 @@ class CreateCompany(APIView):
         :param request:
         :return:
         """
+
+        if self.model.objects.count():
+            return Response(
+                status=HTTP_422_UNPROCESSABLE_ENTITY,
+                data={
+                    ERROR_KEY: ERROR_COMPANY_ALREADY_EXISTS
+                }
+            )
 
         # First, validate data using pydantic class
         try:

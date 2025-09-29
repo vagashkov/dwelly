@@ -1,8 +1,12 @@
-from django.urls import path
+from django.urls import path, include
 
 from .views import CreateCompany
 
 urlpatterns = [
+    path(
+        "addresses/",
+        include("contacts.api.v1.addresses.urls")
+    ),
     path(
         "",
         CreateCompany.as_view(),
