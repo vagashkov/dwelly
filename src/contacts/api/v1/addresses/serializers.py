@@ -7,7 +7,7 @@ from ....models import CompanyAddress
 
 class AddressSerializer(ModelSerializer):
     """
-    Manages blog object details serialization
+    Manages company address object details serialization
     """
 
     class Meta:

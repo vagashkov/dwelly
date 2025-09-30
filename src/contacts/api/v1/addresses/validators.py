@@ -4,7 +4,7 @@ from pyngo import QueryDictModel
 class AddressValidator(QueryDictModel):
     """
     Pydantic model for address validation
-    on processing post ("new company") request
+    on processing post ("new company address") request
     """
 
     country: str

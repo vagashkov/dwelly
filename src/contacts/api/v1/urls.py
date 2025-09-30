@@ -8,6 +8,10 @@ urlpatterns = [
         include("contacts.api.v1.addresses.urls")
     ),
     path(
+        "contacts/",
+        include("contacts.api.v1.contacts.urls")
+    ),
+    path(
         "",
         CreateCompany.as_view(),
         name="api_company"
