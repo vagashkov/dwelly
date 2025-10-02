@@ -12,6 +12,7 @@ class ContactSerializer(ModelSerializer):
         model = CompanyContact
         fields = [
             CompanyContact.Field.contact_type,
+            CompanyContact.Field.company,
             CompanyContact.Field.value,
             CompanyContact.Field.description
             ]

@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-from core.models import Reference
+from core.models import BaseModel, Reference
 
 from .....models import ContactType
 
@@ -16,3 +16,6 @@ class ContactTypeSerializer(ModelSerializer):
             Reference.Field.name,
             Reference.Field.description
             ]
+        read_only_fields = [
+            BaseModel.Field.id
+        ]

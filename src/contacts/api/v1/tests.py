@@ -25,7 +25,7 @@ class CompanyTest(TestCase):
 
     def setUp(self) -> None:
         """
-        Pre-create some posts to browse
+        Pre-create some user accounts
         :return:
         """
         self.standard_user = User.objects.create(

@@ -138,6 +138,12 @@ class CompanyContact(BaseContact):
     Manages storing company contacts (email, Telegram, WhatsApp etc).
     """
 
+    class Field:
+        company: str = "company"
+        contact_type: str = "contact_type"
+        value: str = "value"
+        description: str = "description"
+
     class Meta:
         verbose_name_plural = "Contacts"
 

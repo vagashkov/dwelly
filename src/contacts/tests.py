@@ -1,28 +1,46 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from core.models import Reference
+
 from .models import (
     Company, CompanyAddress,
     ContactType, CompanyContact
 )
 
 company_data = {
-    "short_name": "TestComp",
-    "full_name": "Full Company Name",
-    "registration": "RegNumber by RegDate",
-    "license": "LicenseNumber by LicenseDate",
+    Company.Field.short_name: "TestComp",
+    Company.Field.full_name: "Full Company Name",
+    Company.Field.registration: "RegNumber by RegDate",
+    Company.Field.license: "LicenseNumber by LicenseDate",
 }
 company_address = {
-    "country": "BY",
-    "city": "Minsk",
-    "zip_code": "220340",
-    "street_address": "Novatorov street, 12, of.400"
+    CompanyAddress.Field.country: "BY",
+    CompanyAddress.Field.city: "Minsk",
+    CompanyAddress.Field.zip_code: "220340",
+    CompanyAddress.Field.street_address: "Novatorov street, 12, of.400"
 }
-company_contacts = {
-        "e-mail": "test@email.com",
-        "Telegram": "testogrammo",
-        "Phone": "+3752961121122"
+company_contact_type = {
+    Reference.Field.name: "e-mail",
+    Reference.Field.description: "Preferred contact type"
 }
+company_contacts = [
+    {
+        CompanyContact.Field.contact_type: "e-mail",
+        CompanyContact.Field.value: "test@email.com",
+        CompanyContact.Field.description: "Primary contact"
+    },
+    {
+        CompanyContact.Field.contact_type: "Telegram",
+        CompanyContact.Field.value: "testogrammo",
+        CompanyContact.Field.description: "Express contact"
+    },
+    {
+        CompanyContact.Field.contact_type: "Phone",
+        CompanyContact.Field.value: "+3752961121122",
+        CompanyContact.Field.description: "Call center"
+    }
+]
 
 
 class ContactsTest(TestCase):
@@ -43,12 +61,16 @@ class ContactsTest(TestCase):
             **company_address,
             company=company
         )
-        for contact_type, contact_value in company_contacts.items():
+        for company_contact in company_contacts:
             CompanyContact.objects.create(
                 contact_type=ContactType.objects.create(
-                    name=contact_type
+                    name=company_contact.get(
+                        CompanyContact.Field.contact_type
+                    )
                 ),
-                value=contact_value,
+                value=company_contact.get(
+                    CompanyContact.Field.value
+                ),
                 company=company
             )
 
@@ -61,9 +83,19 @@ class ContactsTest(TestCase):
         for text in company_data.values():
             self.assertContains(response, text)
 
-        for contact_type, contact_value in company_contacts.items():
-            self.assertContains(response, contact_type)
-            self.assertContains(response, contact_value)
+        for company_contact in company_contacts:
+            self.assertContains(
+                response,
+                company_contact.get(
+                    CompanyContact.Field.contact_type
+                )
+            )
+            self.assertContains(
+                response,
+                company_contact.get(
+                    CompanyContact.Field.value
+                )
+            )
 
         # Checking user contact form
         self.assertContains(response, "Your name:")
