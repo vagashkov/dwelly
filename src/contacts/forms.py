@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from django.utils.translation import gettext_lazy as _
 
-from .models import Contact
+from .models import UserMessage
 
 
 class ContactForm(ModelForm):
@@ -10,24 +10,24 @@ class ContactForm(ModelForm):
     """
 
     class Meta:
-        model = Contact
+        model = UserMessage
         fields = [
-            Contact.Field.author,
-            Contact.Field.contact_type,
-            Contact.Field.contact,
-            Contact.Field.text
+            UserMessage.Field.author,
+            UserMessage.Field.contact_type,
+            UserMessage.Field.contact,
+            UserMessage.Field.text
         ]
         labels = {
-            Contact.Field.author: _("Your name:"),
-            Contact.Field.contact_type: _("Contact type:"),
-            Contact.Field.contact: _("Your contact:"),
-            Contact.Field.text: _("Text:"),
+            UserMessage.Field.author: _("Your name:"),
+            UserMessage.Field.contact_type: _("Contact type:"),
+            UserMessage.Field.contact: _("Your contact:"),
+            UserMessage.Field.text: _("Text:"),
         }
 
     def __init__(self, *args: list, **kwargs: dict) -> None:
         super().__init__(*args, **kwargs)
         self.fields[
-            Contact.Field.text
+            UserMessage.Field.text
         ].widget.attrs.update(
             {
                 "cols": "80",

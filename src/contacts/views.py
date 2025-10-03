@@ -45,7 +45,6 @@ class Contacts(View):
         Processing new contact form message
         :param self:
         :param request:
-        :param slug
         :return:
         """
 

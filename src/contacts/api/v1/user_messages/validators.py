@@ -7,12 +7,12 @@ from ....constants import (
     ERROR_NO_AUTHOR_CONTACT,
     ERROR_NO_TEXT
 )
-from ....models import ContactType, Contact
+from ....models import ContactType, UserMessage
 
 
-class ContactValidator(QueryDictModel):
+class UserMessageValidator(QueryDictModel):
     """
-    Pydantic model for user contact messages validation
+    Pydantic model for user messages validation
     on processing post ("new user message") request
     """
 
@@ -21,7 +21,7 @@ class ContactValidator(QueryDictModel):
     contact: str
     text: str
 
-    @field_validator(Contact.Field.author)
+    @field_validator(UserMessage.Field.author)
     def check_author(cls, author: str) -> str:
         if not author:
             raise ValueError(
@@ -29,7 +29,7 @@ class ContactValidator(QueryDictModel):
             )
         return author
 
-    @field_validator(Contact.Field.contact_type)
+    @field_validator(UserMessage.Field.contact_type)
     def check_contact_type(cls, contact_type: int) -> int:
         try:
             ContactType.objects.get(id=contact_type)
@@ -41,7 +41,7 @@ class ContactValidator(QueryDictModel):
                 )
             )
 
-    @field_validator(Contact.Field.contact)
+    @field_validator(UserMessage.Field.contact)
     def check_contact(cls, contact: str) -> str:
         if not contact:
             raise ValueError(
@@ -49,7 +49,7 @@ class ContactValidator(QueryDictModel):
             )
         return contact
 
-    @field_validator(Contact.Field.text)
+    @field_validator(UserMessage.Field.text)
     def check_text(cls, text: str) -> str:
         if not text:
             raise ValueError(

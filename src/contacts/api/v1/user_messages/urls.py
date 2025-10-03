@@ -1,16 +1,16 @@
 from django.urls import path
 
-from .views import ContactMessages, ContactMessageDetails
+from .views import UserMessages, UserMessageDetails
 
 urlpatterns = [
     path(
         "<int:id>",
-        ContactMessageDetails.as_view(),
+        UserMessageDetails.as_view(),
         name="api_user_message_details"
     ),
     path(
         "",
-        ContactMessages.as_view(),
+        UserMessages.as_view(),
         name="api_user_messages"
     )
 ]

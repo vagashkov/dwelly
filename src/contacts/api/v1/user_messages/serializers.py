@@ -4,21 +4,21 @@ from rest_framework.serializers import (
 
 from core.models import BaseModel
 
-from ....models import Contact
+from ....models import UserMessage
 
 
-class ContactSerializer(ModelSerializer):
+class UserMessageSerializer(ModelSerializer):
     """
-    Manages company contact object details serialization
+    Manages user message object serialization
     """
 
     class Meta:
-        model = Contact
+        model = UserMessage
         fields = [
-            Contact.Field.author,
-            Contact.Field.contact_type,
-            Contact.Field.contact,
-            Contact.Field.text
+            UserMessage.Field.author,
+            UserMessage.Field.contact_type,
+            UserMessage.Field.contact,
+            UserMessage.Field.text
             ]
         read_only_fields = [
             BaseModel.Field.id

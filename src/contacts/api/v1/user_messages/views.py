@@ -19,38 +19,38 @@ from core.models import BaseModel
 from core.api.paginators import BasePaginator
 
 from ....constants import ERROR_KEY
-from ....models import Contact, ContactType
+from ....models import UserMessage, ContactType
 
 from .permissions import UserMessagePermissions
-from .serializers import ContactSerializer
-from .validators import ContactValidator
+from .serializers import UserMessageSerializer
+from .validators import UserMessageValidator
 
 
-class ContactMessages(ListCreateAPIView):
+class UserMessages(ListCreateAPIView):
     """
-    Manages company contacts listing and creation
+    Manages user messages listing and creation
     """
 
-    model = Contact
+    model = UserMessage
     pagination_class = BasePaginator
-    serializer_class = ContactSerializer
+    serializer_class = UserMessageSerializer
     permission_classes = [UserMessagePermissions]
 
     def get_queryset(self):
-        return Contact.objects.all().order_by(
+        return UserMessage.objects.all().order_by(
             BaseModel.Field.created_at
         )
 
     def create(self, request: Request, *args, **kwargs) -> Response:
         """
-        New contact creation routine
+        New user message creation routine
         :param request:
         :return:
         """
 
         # First, validate data using pydantic class
         try:
-            ContactValidator.model_validate(
+            UserMessageValidator.model_validate(
                     request.data
                     )
         except PydanticError as error:
@@ -62,7 +62,7 @@ class ContactMessages(ListCreateAPIView):
             )
 
         # Deserialize and check data
-        serializer = ContactSerializer(data=request.data)
+        serializer = UserMessageSerializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
         except ValidationError as error:
@@ -74,14 +74,14 @@ class ContactMessages(ListCreateAPIView):
             )
 
         contact_type = ContactType.objects.get(
-            id=request.data.get(Contact.Field.contact_type)
+            id=request.data.get(UserMessage.Field.contact_type)
         )
 
         # Try to create contact object
         try:
-            contact = serializer.save()
-            contact.contact_type = contact_type
-            contact.save()
+            message = serializer.save()
+            message.contact_type = contact_type
+            message.save()
         except IntegrityError as e:
             return Response(
                 data={ERROR_KEY: e},
@@ -90,17 +90,17 @@ class ContactMessages(ListCreateAPIView):
 
         # And return result
         return Response(
-            data=ContactSerializer(contact).data,
+            data=UserMessageSerializer(message).data,
             status=HTTP_201_CREATED
         )
 
 
-class ContactMessageDetails(RetrieveUpdateDestroyAPIView):
+class UserMessageDetails(RetrieveUpdateDestroyAPIView):
     """
-    Manages single contact type instance lifecycle
+    Manages single user message instance lifecycle
     """
 
-    queryset = Contact.objects.all()
+    queryset = UserMessage.objects.all()
     lookup_field = BaseModel.Field.id
-    serializer_class = ContactSerializer
+    serializer_class = UserMessageSerializer
     permission_classes = [UserMessagePermissions]

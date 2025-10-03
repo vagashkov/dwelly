@@ -165,7 +165,7 @@ class CompanyContact(BaseContact):
     )
 
 
-class Contact(BaseModel):
+class UserMessage(BaseModel):
     """
     Class for contact form messages
     """
