@@ -7,3 +7,7 @@ ERROR_COMPANY_ALREADY_EXISTS = _("Company already exists")
 ERROR_WRONG_CONTACT_TYPE_ID = _("No contact type with an ID {} found")
 ERROR_NO_CONTACT_VALUE = _("No contact value")
 ERROR_WRONG_COMPANY_ID = _("No company with an ID {} found")
+
+ERROR_NO_AUTHOR_NAME = _("No author name provided")
+ERROR_NO_AUTHOR_CONTACT = _("No author contact provided")
+ERROR_NO_TEXT = _("No text provided")

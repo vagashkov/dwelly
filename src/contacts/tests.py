@@ -5,7 +5,8 @@ from core.models import Reference
 
 from .models import (
     Company, CompanyAddress,
-    ContactType, CompanyContact
+    ContactType, CompanyContact,
+    Contact
 )
 
 company_data = {
@@ -39,6 +40,26 @@ company_contacts = [
         CompanyContact.Field.contact_type: "Phone",
         CompanyContact.Field.value: "+3752961121122",
         CompanyContact.Field.description: "Call center"
+    }
+]
+user_messages = [
+    {
+        Contact.Field.contact_type: "e-mail",
+        Contact.Field.author: "Peter Pan",
+        Contact.Field.contact: "peter@neverhood.com",
+        Contact.Field.text: "Please contact me ASAP"
+    },
+    {
+        Contact.Field.contact_type: "Telegram",
+        Contact.Field.author: "Incognito",
+        Contact.Field.contact: "@Inco.gnito",
+        Contact.Field.text: "I would like no stay unknown"
+    },
+    {
+        Contact.Field.contact_type: "Phone",
+        Contact.Field.author: "Zodiac",
+        Contact.Field.contact: "+3280081275",
+        Contact.Field.text: "Please contact me ASAP"
     }
 ]
 

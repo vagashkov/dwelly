@@ -37,7 +37,7 @@ class ContactValidator(QueryDictModel):
             )
 
     @field_validator(CompanyContact.Field.value)
-    def check_value(cls, value: str) -> str:
+    def check_contact_value(cls, value: str) -> str:
         if not value:
             raise ValueError(
                 ERROR_NO_CONTACT_VALUE
