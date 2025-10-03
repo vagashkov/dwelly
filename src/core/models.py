@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import (
     Model, BigAutoField, UUIDField,
     CharField, DateTimeField, BooleanField,
-    ManyToManyField
+    ForeignKey, PROTECT, ManyToManyField
 )
 from django.utils.translation import gettext_lazy as _
 
@@ -82,7 +82,7 @@ class Reference(BaseModel):
     class Meta:
         abstract = True
 
-    name: str = CharField(
+    name: CharField = CharField(
         null=False,
         blank=False,
         unique=True,
@@ -90,7 +90,7 @@ class Reference(BaseModel):
         verbose_name=_("Name")
     )
 
-    description: str = CharField(
+    description: CharField = CharField(
         null=False,
         blank=True,
         default="",
@@ -100,9 +100,6 @@ class Reference(BaseModel):
 
     def __str__(self) -> str:
         return "{}".format(self.name)
-
-    def natural_key(self) -> tuple[str]:
-        return (self.name,)
 
 
 class BaseStatus(Reference):
@@ -126,7 +123,7 @@ class BaseStatus(Reference):
         default=False
     )
 
-    previous_statuses = ManyToManyField(
+    previous_statuses: ManyToManyField = ManyToManyField(
         "self",
         blank=True,
         symmetrical=False,
@@ -134,7 +131,7 @@ class BaseStatus(Reference):
         verbose_name=_("Previous statuses")
     )
 
-    next_statuses = ManyToManyField(
+    next_statuses: ManyToManyField = ManyToManyField(
         "self",
         blank=True,
         symmetrical=False,
@@ -152,3 +149,54 @@ class BaseStatus(Reference):
             raise ValidationError(
                 MSG_INITIAL_STATUS_PREDECESSORS
             )
+
+
+class ContactType(Reference):
+    """
+    Manages storing different contact info types
+    (email, phone, WhatsApp, Telegram etc.)
+    """
+    pass
+
+
+class BaseContact(BaseModel):
+    """
+    Manages storing different contacts
+    """
+
+    class Meta:
+        abstract = True
+
+    class Field:
+        contact_type: str = "contact_type"
+        value: str = "value"
+        description: str = "description"
+
+    contact_type: ForeignKey = ForeignKey(
+        ContactType,
+        null=False,
+        blank=False,
+        on_delete=PROTECT,
+        verbose_name=_("Contact type")
+    )
+
+    value: CharField = CharField(
+        null=False,
+        blank=False,
+        max_length=256,
+        verbose_name=_("Value")
+    )
+
+    description: CharField = CharField(
+        null=False,
+        blank=True,
+        default="",
+        max_length=256,
+        verbose_name=_("Description")
+    )
+
+    def __str__(self) -> str:
+        return "{}: {}".format(
+            self.contact_type,
+            self.value
+        )

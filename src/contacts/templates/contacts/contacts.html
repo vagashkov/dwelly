@@ -1,0 +1,57 @@
+{% extends "_base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block css_files %}
+{% endblock %}
+{% block title %}Contacts{% endblock title %}
+{% block content %}
+    <!-- Company info -->
+    <main class="container bg-light text-dark border rounded-4 shadow-sm">
+        <h2>{{ company.short_name }}</h2>
+        <div class="mt-2">
+            {{ company.description|safe|linebreaks }}
+        </div>
+
+        <!-- Legal data -->
+        <section class="row border rounded-3 m-1">
+        <dl>
+            <dt class="col-3 d-inline-block">Full name:</dt>
+            <dd class="col-9 d-inline-block">{{ company.full_name }}</dd>
+            <dt class="col-3 d-inline-block">Registration:</dt>
+            <dd class="col-9 d-inline-block">{{ company.registration }}</dd>
+            <dt class="col-3 d-inline-block">License:</dt>
+            <dd class="col-9 d-inline-block">{{ company.license }}</dd>
+        </dl>
+        </section>
+
+        <!-- Addresses -->
+        <section class="row border rounded-3 m-1">
+            {% for address in company.addresses.all %}
+            <dl>
+            <dt class="col-3 d-inline-block">Address(-es):</dt>
+                <dd class="col-9 d-inline-block">{{ address }}</dd>
+            </dl>
+            {% endfor %}
+        </section>
+
+
+        <!-- Contacts -->
+        <section class="row border rounded-3 m-1">
+            {% for contact in company.contacts.all %}
+            <dl>
+            <dt class="col-3 d-inline-block">{{ contact.contact_type.name}} :</dt>
+                <dd class="col-9 d-inline-block">{{ contact.value }}</dd>
+            </dl>
+            {% endfor %}
+        </section>
+    </main>
+    <br>
+    <section id="contact-form" class="container bg-light text-dark border rounded-4 form-outline w-50">
+        <h3>Contact form:</h3>
+        <form action="{% url 'contacts:company_info' %}" method="POST">
+            {% csrf_token %}
+            {{ contact_form | crispy }}
+            <button class="btn btn-secondary btn-sm mb-2">Submit </button>
+        </form>
+    </section>
+{% endblock content %}
