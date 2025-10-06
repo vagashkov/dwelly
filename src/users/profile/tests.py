@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from os import mkdir
 from os.path import exists
 from shutil import rmtree
@@ -120,7 +121,7 @@ class ProfileTest(TestCase):
         self.response = self.client.get(
             reverse("user_display_profile")
         )
-        self.assertEqual(self.response.status_code, 200)
+        self.assertEqual(self.response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(self.response, "users/display_profile.html")
 
         # checking text data

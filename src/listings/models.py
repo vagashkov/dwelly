@@ -1,5 +1,9 @@
 from datetime import date
 from decimal import Decimal
+from io import BytesIO
+
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -11,6 +15,7 @@ from django.db.models import (
     ForeignKey, PROTECT, CASCADE, ManyToManyField,
     Manager
 )
+from django.http import Http404
 from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -18,13 +23,16 @@ from django.utils.translation import gettext_lazy as _
 from djmoney.money import Money
 from djmoney.models.fields import MoneyField
 
+from contacts.models import Company
+
 from core.models import BaseModel, Reference, BaseStatus
 from core.utils.dates import daterange_generator
 from core.utils.images import convert_image, create_thumbnails
 
 from .constants import (
     ERROR_MSG_NEGATIVE_DAY_RATE,
-    ERROR_MSG_OVERLAPPING_DATES
+    ERROR_MSG_OVERLAPPING_DATES,
+    TITLE_FONT_SIZE, STANDARD_FONT_SIZE
 )
 
 User = get_user_model()
@@ -676,3 +684,47 @@ class Reservation(BaseModel):
         return Money(
             total_cost, settings.BASE_CURRENCY
         )
+
+    def get_voucher(self) -> BytesIO:
+        """
+
+        :return:
+        """
+
+        if not Company.objects.all().count:
+            raise Http404
+
+        company = Company.objects.all()[0]
+
+        buffer = BytesIO()
+        page = canvas.Canvas(buffer, pagesize=A4)
+
+        page.setFontSize(TITLE_FONT_SIZE)
+        page.drawString(225, 700, "Reservation voucher")
+
+        page.setFontSize(STANDARD_FONT_SIZE)
+        page.drawString(250, 650, self.listing.title)
+        page.drawString(100, 600, "Check-in date: {}".format(self.check_in))
+        page.drawString(100, 550, "Check-out date: {}".format(self.check_out))
+        page.drawString(
+            100, 500, "Guest: {}".format(self.user.profile.full_name())
+        )
+
+        page.drawString(
+            100, 400, company.full_name
+        )
+        index = 0
+        for contact in company.contacts.all():
+            page.drawString(
+                100, 350 - 50 * index, "{}: {}".format(
+                    contact.contact_type.name,
+                    contact.value
+                )
+            )
+            index += 1
+
+        page.showPage()
+        page.save()
+        buffer.seek(0)
+
+        return buffer

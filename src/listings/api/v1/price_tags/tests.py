@@ -1,6 +1,8 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
+from http import HTTPStatus
+
 from django.shortcuts import reverse
 
 from rest_framework.status import (
@@ -195,7 +197,7 @@ class PriceTags(BaseListingsAPITest):
                 }
             ),
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
         self.assertEqual(
             len(response.data.get("results")),
@@ -236,7 +238,7 @@ class PriceTags(BaseListingsAPITest):
                 }
             ),
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
         self.assertEqual(
             len(response.data.get("results")),

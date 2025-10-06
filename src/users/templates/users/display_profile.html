@@ -54,6 +54,7 @@
                 <td class="pt-2">{{ reservation.cost.amount|floatformat:2 }} {{ reservation.cost.currency }}</td>
                 <td class="pt-2"><a href="{% url 'listings:submit_reservation' reservation.public_id %}">Submit</a></td>
                 <td class="pt-2"><a href="{% url 'listings:cancel_reservation' reservation.public_id %}">Cancel</a></td>
+                <td class="pt-2"><a href="{% url 'listings:reservation_voucher' reservation.public_id %}">Voucher</a></td>
             </tr>
             {% endfor %}
             </tbody>

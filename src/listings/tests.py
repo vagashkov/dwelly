@@ -1,5 +1,6 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from http import HTTPStatus
 from shutil import rmtree
 
 from django.contrib.auth import get_user_model
@@ -39,7 +40,7 @@ class ListingTests(TestCase):
     def test_listings_list(self) -> None:
         # Checking listings list URL and template
         response = self.client.get(reverse("listings:list"))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "listings/list.html")
         self.assertContains(response, self.listing.title)
         self.assertContains(response, self.listing.object_type.name)
@@ -51,12 +52,12 @@ class ListingTests(TestCase):
     def test_unknown_listing_details(self) -> None:
         # Checking for non-existing listing details
         no_response = self.client.get("/listing/wrong")
-        self.assertEqual(no_response.status_code, 404)
+        self.assertEqual(no_response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_existing_listing_details(self) -> None:
         # Checking existing listing details
         response = self.client.get(self.listing.get_absolute_url())
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "listings/details.html")
 
         # Checking if all the data available

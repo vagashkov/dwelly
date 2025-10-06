@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from os import mkdir
 from os.path import exists
 from shutil import rmtree
@@ -102,7 +104,7 @@ class PostTests(BaseTest):
 
     def test_posts_list(self) -> None:
         response = self.client.get(reverse("blog:posts"))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Active post")
         self.assertContains(response, "Active post excerpt")
         self.assertNotContains(response, "Draft post")
@@ -117,18 +119,18 @@ class PostTests(BaseTest):
                 }
             )
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Active post")
         self.assertContains(response, "Active post excerpt")
         self.assertTemplateUsed(response, "blog/posts.html")
 
     def test_unknown_post_details(self) -> None:
         no_response = self.client.get("/blog/no-post")
-        self.assertEqual(no_response.status_code, 404)
+        self.assertEqual(no_response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_existing_post_details(self) -> None:
         response = self.client.get(self.active_post.get_absolute_url())
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "blog/post_details.html")
         # Checking post data
         self.assertContains(response, self.author.email)

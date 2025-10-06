@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 from django.http import (
-    HttpRequest, HttpResponse,
+    HttpRequest, HttpResponse, FileResponse,
     HttpResponseForbidden, Http404, HttpResponseRedirect
 )
 from django.shortcuts import render, redirect
@@ -245,3 +245,24 @@ class CancelReservation(UpdateReservation):
     Performs operations with single reservation object defined by its public ID
     """
     ACTION = "cancel"
+
+
+class ReservationVoucher(View):
+    """
+    Reservation voucher generator
+    """
+
+    def get(self, request: HttpRequest, public_id: str):
+        try:
+            reservation = Reservation.objects.get(
+                id=settings.FF3_CIPHER.decrypt(public_id)
+            )
+        except Reservation.DoesNotExist:
+            raise Http404
+
+        return FileResponse(
+            reservation.get_voucher(),
+            as_attachment=True,
+            content_type="application/pdf",
+            filename="reservation_voucher.pdf"
+        )

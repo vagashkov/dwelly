@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
 from django.test import TestCase, Client
@@ -122,7 +124,7 @@ class SignUpPage(TestCase):
         self.response = self.client.get(
             reverse("account_signup")
         )
-        self.assertEqual(self.response.status_code, 200)
+        self.assertEqual(self.response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(self.response, "account/signup.html")
         self.assertContains(self.response, "Sign Up")
         self.assertNotContains(self.response, "Some wrong text")
@@ -149,7 +151,7 @@ class LoginPage(TestCase):
             reverse("account_login")
         )
 
-        self.assertEqual(self.response.status_code, 200)
+        self.assertEqual(self.response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(self.response, "account/login.html")
         self.assertContains(self.response, "Sign In")
         self.assertNotContains(self.response, "Some wrong text")
@@ -170,7 +172,7 @@ class LoginPage(TestCase):
 
         # after successful authorization user
         # should be redirected to the home page
-        self.assertEqual(self.response.status_code, 302)
+        self.assertEqual(self.response.status_code, HTTPStatus.FOUND)
         self.assertEqual(
             self.response.headers.get("Location"),
             reverse("home")
@@ -188,7 +190,7 @@ class LoginPage(TestCase):
 
         # after successful logout  user
         # should be redirected to the home page
-        self.assertEqual(self.response.status_code, 302)
+        self.assertEqual(self.response.status_code, HTTPStatus.FOUND)
         self.assertEqual(
             self.response.headers.get("Location"),
             reverse("home")
@@ -233,7 +235,7 @@ class AdminPanel(TestCase):
             reverse("admin:users_user_change", args=[self.user.id])
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, self.user.email)
 
     def test_create_user_page(self) -> None:
@@ -242,4 +244,4 @@ class AdminPanel(TestCase):
         response = self.client.get(
             reverse("admin:users_user_add")
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)

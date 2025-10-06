@@ -1,14 +1,22 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
+from http import HTTPStatus
+
 from django.conf import settings
 from django.shortcuts import reverse
 
 from rest_framework.status import (
+    HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_403_FORBIDDEN,
     HTTP_422_UNPROCESSABLE_ENTITY
 )
+
+from contacts.models import Company, CompanyContact, ContactType
+from contacts.tests import company_data, company_contacts
+
+from core.models import BaseModel
 
 from tests.data import good_reservation
 from tests.objects import create_good_listing
@@ -186,7 +194,7 @@ class Reservations(BaseListingsAPITest):
                 }
             ),
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
         self.assertEqual(
             len(response.data.get("results")),
@@ -213,3 +221,53 @@ class Reservations(BaseListingsAPITest):
                     Reservation.Field.currency
                     )
             )
+
+    def test_reservation_voucher(self) -> None:
+        """
+        Verifying reservation voucher download endpoint
+        :return:
+        """
+
+        user = self.engage_user()
+
+        company = Company.objects.create(**company_data)
+        contacts_list = company_contacts.copy()
+        for contact in contacts_list:
+            contact_type, _ = ContactType.objects.get_or_create(
+                name=contact.get(CompanyContact.Field.contact_type)
+            )
+            contact[CompanyContact.Field.contact_type] = contact_type.id
+            contact[CompanyContact.Field.company] = company.id
+            CompanyContact.objects.create(
+                contact_type=contact_type,
+                value=contact.get(CompanyContact.Field.value),
+                description=contact.get(CompanyContact.Field.description),
+                company=company
+            )
+
+        reservation = Reservation.objects.create(
+            listing=self.listing,
+            user=user,
+            check_in=date.today(),
+            check_out=date.today() + relativedelta(weeks=1, days=-1)
+            )
+        reservation.save()
+
+        # Simulate a GET request to your view
+        response = self.client.get(
+            reverse(
+                "listings:api_reservation_voucher",
+                kwargs={
+                    Listing.Field.slug: self.listing.slug,
+                    BaseModel.Field.public_id: reservation.public_id
+                }
+            ),
+        )
+
+        # Assert response service data
+        self.assertEqual(response.status_code, HTTP_200_OK)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+        self.assertIn(
+            'attachment; filename="reservation_voucher.pdf"',
+            response["Content-Disposition"]
+        )

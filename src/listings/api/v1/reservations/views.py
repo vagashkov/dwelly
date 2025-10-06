@@ -1,14 +1,20 @@
 from pydantic import ValidationError
 from pyngo import drf_error_details
 
+from django.conf import settings
+from django.http import FileResponse
+
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import (
+    ListCreateAPIView, RetrieveUpdateDestroyAPIView
+)
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_422_UNPROCESSABLE_ENTITY
 )
+from rest_framework.views import APIView
 
 from ....models import Listing, Reservation
 
@@ -105,4 +111,54 @@ class ListingReservations(ListCreateAPIView):
             data=ReservationSerializer(
                 reservation
             ).data
+        )
+
+
+class ReservationDetails(RetrieveUpdateDestroyAPIView):
+    """
+    Manages single object type instance lifecycle
+    """
+
+    serializer_class = ReservationSerializer
+    permission_classes = [ReservationPermissions]
+
+    def get_object(self) -> Reservation:
+        """
+        Returns the object the view is displaying.
+        """
+        public_id = self.kwargs.get("public_id")
+
+        try:
+            reservation = Reservation.objects.get(
+                id=settings.FF3_CIPHER.decrypt(public_id)
+            )
+        except Reservation.DoesNotExist:
+            raise NotFound
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, reservation)
+
+        return reservation
+
+
+class ReservationVoucher(APIView):
+    """
+    Manages single object type instance lifecycle
+    """
+
+    permission_classes = [ReservationPermissions]
+
+    def get(self, request: Request, slug: str, public_id: str) -> FileResponse:
+        try:
+            reservation = Reservation.objects.get(
+                id=settings.FF3_CIPHER.decrypt(public_id)
+            )
+        except Reservation.DoesNotExist:
+            raise NotFound
+
+        return FileResponse(
+            reservation.get_voucher(),
+            as_attachment=True,
+            content_type="application/pdf",
+            filename="reservation_voucher.pdf"
         )

@@ -1,5 +1,6 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from http import HTTPStatus
 from os import mkdir
 from os.path import exists
 from shutil import rmtree
@@ -326,7 +327,7 @@ class ListingsAPITest(BaseListingsAPITest):
 
         # Checking listings list URL and template
         response = self.client.get(reverse("listings:api_list"))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
         self.assertEqual(
             len(response.data["results"]),
@@ -362,7 +363,7 @@ class ListingsAPITest(BaseListingsAPITest):
                 }
             ),
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
         for key in good_listing.keys():
             self.assertEqual(
@@ -434,7 +435,7 @@ class ListingsAPITest(BaseListingsAPITest):
                 }
             ),
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
         self.assertEqual(
             response.data.get(

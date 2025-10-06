@@ -2,7 +2,8 @@ from django.urls import path, include
 
 from .views import (
     List, Details, Calendar,
-    SubmitReservation, ApproveReservation, CancelReservation
+    SubmitReservation, ApproveReservation, CancelReservation,
+    ReservationVoucher
 )
 
 app_name = "listings"
@@ -10,6 +11,12 @@ app_name = "listings"
 urlpatterns = [
     # API urls
     path("api/", include("listings.api.urls")),
+
+    path(
+        "reservations/<str:public_id>/voucher",
+        ReservationVoucher.as_view(),
+        name="reservation_voucher"
+    ),
 
     path(
         "reservations/<str:public_id>/submit",

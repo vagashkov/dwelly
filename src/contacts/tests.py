@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -98,7 +100,7 @@ class ContactsTest(TestCase):
     def test_company_info(self) -> None:
         response = self.client.get(reverse("contacts:company_info"))
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "contacts/contacts.html")
 
         for text in company_data.values():

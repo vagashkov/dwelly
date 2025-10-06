@@ -5,6 +5,7 @@ attrs==25.3.0
 babel==2.17.0
 billiard==4.2.1
 celery==5.5.3
+charset-normalizer==3.4.3
 click==8.2.1
 click-didyoumean==0.3.1
 click-plugins==1.1.1.2
@@ -50,6 +51,7 @@ pytz==2025.2
 PyYAML==6.0.2
 redis==6.2.0
 referencing==0.36.2
+reportlab==4.4.4
 rpds-py==0.26.0
 setuptools==80.9.0
 six==1.17.0

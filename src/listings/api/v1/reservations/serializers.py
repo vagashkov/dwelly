@@ -2,6 +2,8 @@ from rest_framework.serializers import (
     ModelSerializer, SerializerMethodField
 )
 
+from core.models import BaseModel
+
 from ....models import Reservation
 
 
@@ -20,9 +22,15 @@ class ReservationSerializer(ModelSerializer):
     def get_currency(self, instance):
         return instance.cost.currency.code
 
+    public_id = SerializerMethodField()
+
+    def get_public_id(self, instance):
+        return instance.public_id
+
     class Meta:
         model = Reservation
         fields = [
+            BaseModel.Field.public_id,
             Reservation.Field.check_in,
             Reservation.Field.check_out,
             Reservation.Field.comment,
