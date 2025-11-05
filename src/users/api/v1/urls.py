@@ -5,7 +5,23 @@ from .views import (
     DisplayProfile, UserProfile
 )
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 urlpatterns = [
+    # JWT authentication section
+    path(
+        "auth/token/",
+        TokenObtainPairView.as_view(),
+        name="rest_token_obtain"
+    ),
+    path(
+        "auth/token/refresh/",
+        TokenRefreshView.as_view(),
+        name="rest_token_refresh"
+    ),
     # user authentication section
     path(
         "auth/",

@@ -22,6 +22,7 @@ django-phonenumber-field==8.1.0
 django-tinymce==4.1.0
 django_coverage_plugin==3.1.1
 djangorestframework==3.16.0
+djangorestframework_simplejwt==5.5.1
 drf-spectacular==0.28.0
 environs==14.2.0
 ff3==1.0.2
@@ -44,6 +45,8 @@ pycryptodome==3.23.0
 pydantic==2.11.7
 pydantic_core==2.33.2
 pyflakes==3.4.0
+Pygments==2.19.2
+PyJWT==2.10.1
 pyngo==2.4.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
